@@ -2,6 +2,10 @@
 
 Find and book the perfect gaming table for your next board game night.
 
+## Screenshots
+
+![App Screenshot](public/TableFinder_Screen.jpeg)
+
 ## Project Info
 
 - **Repository:** [GitHub link here]
