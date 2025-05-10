@@ -1,11 +1,11 @@
-
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Settings, User, sofa } from "lucide-react";
+import { ArrowLeft, Settings, User, Sofa } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 const ProfilePage = () => {
   const handleSave = () => {
@@ -75,14 +75,14 @@ const ProfilePage = () => {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 p-3 bg-muted rounded-md">
-                      {sofa && <sofa className="h-8 w-8 text-primary" />}
+                      <Sofa className="h-8 w-8 text-primary" />
                       <div>
                         <h3 className="font-medium">Library Lounge Sofa</h3>
                         <p className="text-xs text-muted-foreground">Visited yesterday</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-muted rounded-md">
-                      {sofa && <sofa className="h-8 w-8 text-primary" />}
+                      <Sofa className="h-8 w-8 text-primary" />
                       <div>
                         <h3 className="font-medium">Comfy Corner Couch</h3>
                         <p className="text-xs text-muted-foreground">Visited last week</p>
@@ -132,6 +132,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-
-// Missing Badge import
-import { Badge } from "@/components/ui/badge";

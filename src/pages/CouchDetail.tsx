@@ -1,11 +1,10 @@
-
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getCouchById } from "@/services/couchData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, MapPin, Calendar, Star, sofa } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Star, Sofa } from "lucide-react";
 import { toast } from "sonner";
 
 const CouchDetail = () => {
@@ -68,7 +67,7 @@ const CouchDetail = () => {
           />
         ) : (
           <div className="text-muted-foreground">
-            {sofa && <sofa className="h-16 w-16" />}
+            <Sofa className="h-16 w-16" />
           </div>
         )}
       </div>

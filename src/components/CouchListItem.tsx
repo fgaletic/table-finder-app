@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Couch } from "@/services/couchData";
 import { Badge } from "@/components/ui/badge";
-import { sofa } from "lucide-react";
+import { Sofa } from "lucide-react";
 
 interface CouchListItemProps {
   couch: Couch;
@@ -28,7 +28,7 @@ const CouchListItem = ({ couch }: CouchListItemProps) => {
               />
             ) : (
               <div className="text-muted-foreground">
-                {sofa && <sofa className="h-8 w-8" />}
+                <Sofa className="h-8 w-8" />
               </div>
             )}
           </div>

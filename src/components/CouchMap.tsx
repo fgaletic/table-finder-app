@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Couch } from "@/services/couchData";
 import { useNavigate } from "react-router-dom";
-import { sofa, MapPin } from "lucide-react";
+import { Sofa, MapPin } from "lucide-react";
 
 interface CouchMapProps {
   couches: Couch[];
@@ -91,7 +90,7 @@ const CouchMap = ({ couches, isLoading = false }: CouchMapProps) => {
                 <div className="absolute -inset-3 bg-primary/20 rounded-full animate-pulse-soft"></div>
               )}
               <div className={`${color} bg-white p-1 rounded-full shadow-md`}>
-                {sofa && <sofa className="h-5 w-5" />}
+                <Sofa className="h-5 w-5" />
               </div>
               
               {isSelected && (

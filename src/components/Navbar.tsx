@@ -1,15 +1,13 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Menu, User } from "lucide-react";
+import { Search, MapPin, Menu, User, Sofa } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { sofa } from "lucide-react";
 
 const Navbar = () => {
   return (
@@ -18,7 +16,7 @@ const Navbar = () => {
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center gap-2 font-semibold text-xl">
             <div className="bg-primary p-1 rounded-md text-white">
-              {sofa && <sofa className="h-6 w-6" />}
+              <Sofa className="h-6 w-6" />
             </div>
             <span className="hidden sm:inline-block">CouchFinder</span>
           </Link>
