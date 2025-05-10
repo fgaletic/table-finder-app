@@ -30,7 +30,7 @@ Find and book the perfect gaming table for your next board game night.
 
 ```sh
 git clone <YOUR_GIT_URL>
-cd couch-potato-finder-app
+cd table-finder-app
 npm install
 ```
 
