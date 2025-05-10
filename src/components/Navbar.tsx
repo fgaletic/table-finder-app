@@ -18,7 +18,7 @@ const Navbar = () => {
             <div className="bg-primary p-1 rounded-md text-white">
               <Dices className="h-6 w-6" />
             </div>
-            <span className="hidden sm:inline-block">TableFinder</span>
+            <span className="hidden sm:inline-block">TableQuest</span>
           </Link>
         </div>
 
