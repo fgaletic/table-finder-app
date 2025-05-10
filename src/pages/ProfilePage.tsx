@@ -3,15 +3,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Settings, User, Sofa } from "lucide-react";
+import { ArrowLeft, Settings, User, Dices } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
 const ProfilePage = () => {
   const handleSave = () => {
-    toast.success("Profile settings saved!");
+    toast.success("Preferences saved!");
   };
-  
+
   return (
     <div className="animate-fade-in space-y-6">
       <div className="flex items-center gap-4">
@@ -22,7 +22,7 @@ const ProfilePage = () => {
         </Button>
         <h1 className="text-2xl font-bold">My Profile</h1>
       </div>
-      
+
       <div className="flex flex-col md:flex-row gap-6">
         <aside className="w-full md:w-1/3">
           <Card>
@@ -38,7 +38,7 @@ const ProfilePage = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center text-sm">
-                <span>Couches visited</span>
+                <span>Tables visited</span>
                 <span className="font-medium">3</span>
               </div>
               <div className="flex justify-between items-center text-sm">
@@ -59,54 +59,54 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
         </aside>
-        
+
         <main className="w-full md:w-2/3">
           <Tabs defaultValue="activity">
             <TabsList className="w-full grid grid-cols-2">
               <TabsTrigger value="activity">My Activity</TabsTrigger>
               <TabsTrigger value="preferences">Preferences</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="activity" className="mt-6 space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Recently Visited</CardTitle>
+                  <CardTitle>Recently Visited Tables</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 p-3 bg-muted rounded-md">
-                      <Sofa className="h-8 w-8 text-primary" />
+                      <Dices className="h-8 w-8 text-primary" />
                       <div>
-                        <h3 className="font-medium">Library Lounge Sofa</h3>
+                        <h3 className="font-medium">Library Lounge Dices</h3>
                         <p className="text-xs text-muted-foreground">Visited yesterday</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-muted rounded-md">
-                      <Sofa className="h-8 w-8 text-primary" />
+                      <Dices className="h-8 w-8 text-primary" />
                       <div>
-                        <h3 className="font-medium">Comfy Corner Couch</h3>
+                        <h3 className="font-medium">Comfy Corner Table</h3>
                         <p className="text-xs text-muted-foreground">Visited last week</p>
                       </div>
                     </div>
                     <div className="text-center mt-4">
                       <Button variant="link" asChild>
-                        <Link to="/">Find more couches</Link>
+                        <Link to="/">Find more tables</Link>
                       </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
-            
+
             <TabsContent value="preferences" className="mt-6 space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Couch Preferences</CardTitle>
+                  <CardTitle>Table Preferences</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium">Must have amenities</label>
+                      <label className="text-sm font-medium">Must-have amenities</label>
                       <div className="flex gap-2 mt-2 flex-wrap">
                         <Badge className="rounded-full px-3 py-1 bg-primary/10 text-primary border-primary/30">WiFi</Badge>
                         <Badge className="rounded-full px-3 py-1 bg-primary/10 text-primary border-primary/30">Power Outlet</Badge>
@@ -116,7 +116,7 @@ const ProfilePage = () => {
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="pt-4 border-t">
                       <Button onClick={handleSave}>Save Preferences</Button>
                     </div>

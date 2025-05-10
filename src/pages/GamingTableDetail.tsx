@@ -1,19 +1,19 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getCouchById } from "@/services/couchData";
+import { getGamingTableById } from "@/services/gamingTableData";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, MapPin, Calendar, Star, Sofa } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Star, Dices } from "lucide-react";
 import { toast } from "sonner";
 
-const CouchDetail = () => {
+const GamingTableDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
-  const { data: couch, isLoading, error } = useQuery({
-    queryKey: ['couch', id],
-    queryFn: () => getCouchById(id || ""),
+  const { data: table, isLoading, error } = useQuery({
+    queryKey: ['table', id],
+    queryFn: () => getGamingTableById(id || ""),
     enabled: !!id
   });
   
@@ -21,17 +21,17 @@ const CouchDetail = () => {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-muted-foreground">Loading couch details...</p>
+        <p className="mt-4 text-muted-foreground">Loading table details...</p>
       </div>
     );
   }
   
-  if (error || !couch) {
+  if (error || !table) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-2xl font-bold mb-4">Couch Not Found</h2>
+        <h2 className="text-2xl font-bold mb-4">Table Not Found</h2>
         <p className="text-muted-foreground mb-8">
-          Sorry, we couldn't find the couch you're looking for.
+          Sorry, we couldn't find the table you're looking for.
         </p>
         <Button onClick={() => navigate('/')}>Back to Home</Button>
       </div>
@@ -39,12 +39,12 @@ const CouchDetail = () => {
   }
   
   const handleCheckAvailability = () => {
-    if (couch.availability.status === "available") {
-      toast.success("This couch is available! Hurry over before someone else takes it.");
-    } else if (couch.availability.status === "occupied") {
-      toast.info(`This couch is currently occupied until ${couch.availability.until}`);
+    if (table.availability.status === "available") {
+      toast.success("This table is available! Hurry over before someone else takes it.");
+    } else if (table.availability.status === "occupied") {
+      toast.info(`This table is currently occupied until ${table.availability.until}`);
     } else {
-      toast.error("This couch is currently under maintenance.");
+      toast.error("This table is currently under maintenance.");
     }
   };
 
@@ -54,20 +54,20 @@ const CouchDetail = () => {
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-2xl font-bold">{couch.name}</h1>
+        <h1 className="text-2xl font-bold">{table.name}</h1>
       </div>
       
       {/* Image gallery */}
       <div className="bg-muted rounded-lg overflow-hidden h-64 flex items-center justify-center">
-        {couch.images && couch.images.length > 0 ? (
+        {table.images && table.images.length > 0 ? (
           <img 
-            src={couch.images[0]} 
-            alt={couch.name} 
+            src={table.images[0]} 
+            alt={table.name} 
             className="w-full h-full object-cover"
           />
         ) : (
           <div className="text-muted-foreground">
-            <Sofa className="h-16 w-16" />
+            <Dices className="h-16 w-16" />
           </div>
         )}
       </div>
@@ -80,44 +80,44 @@ const CouchDetail = () => {
               <div>
                 <div className="flex items-center gap-2 text-muted-foreground mb-2">
                   <MapPin className="h-4 w-4" />
-                  <span className="text-sm">{couch.location.address}</span>
-                  <span className="text-sm">({couch.distance}m away)</span>
+                  <span className="text-sm">{table.location.address}</span>
+                  <span className="text-sm">({table.distance}m away)</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="flex items-center">
                     <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                    <span className="ml-1 font-medium">{couch.rating}</span>
+                    <span className="ml-1 font-medium">{table.rating}</span>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    ({couch.reviewCount} reviews)
+                    ({table.reviewCount} reviews)
                   </span>
                 </div>
               </div>
               
               <Badge 
                 className={
-                  couch.availability.status === "available" 
+                  table.availability.status === "available" 
                     ? "bg-green-500" 
-                    : couch.availability.status === "occupied" 
+                    : table.availability.status === "occupied" 
                     ? "bg-amber-500" 
                     : "bg-red-500"
                 }
               >
-                {couch.availability.status.charAt(0).toUpperCase() + couch.availability.status.slice(1)}
-                {couch.availability.until && ` until ${couch.availability.until}`}
+                {table.availability.status.charAt(0).toUpperCase() + table.availability.status.slice(1)}
+                {table.availability.until && ` until ${table.availability.until}`}
               </Badge>
             </div>
             
             <div className="space-y-4">
               <div>
                 <h2 className="text-lg font-medium mb-2">Description</h2>
-                <p className="text-muted-foreground">{couch.description}</p>
+                <p className="text-muted-foreground">{table.description}</p>
               </div>
               
               <div>
                 <h2 className="text-lg font-medium mb-2">Amenities</h2>
                 <div className="flex flex-wrap gap-2">
-                  {couch.amenities.map((amenity) => (
+                  {table.amenities.map((amenity) => (
                     <Badge key={amenity} variant="outline">
                       {amenity}
                     </Badge>
@@ -135,21 +135,21 @@ const CouchDetail = () => {
                 <h3 className="text-lg font-medium mb-2">Current Status</h3>
                 <div 
                   className={`inline-flex items-center px-3 py-1 rounded-full text-white 
-                    ${couch.availability.status === "available" 
+                    ${table.availability.status === "available" 
                       ? "bg-green-500" 
-                      : couch.availability.status === "occupied" 
+                      : table.availability.status === "occupied" 
                       ? "bg-amber-500" 
                       : "bg-red-500"
                     }`}
                 >
                   <span className="capitalize font-medium">
-                    {couch.availability.status}
+                    {table.availability.status}
                   </span>
                 </div>
-                {couch.availability.until && (
+                {table.availability.until && (
                   <div className="mt-2 text-sm text-muted-foreground flex items-center justify-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>Until {couch.availability.until}</span>
+                    <span>Until {table.availability.until}</span>
                   </div>
                 )}
               </div>
@@ -164,7 +164,7 @@ const CouchDetail = () => {
           </Card>
           
           <div className="p-4 bg-muted rounded-lg text-sm text-center text-muted-foreground">
-            <p>See something wrong with this couch?</p>
+            <p>See something wrong with this table?</p>
             <Link to="/profile" className="text-primary hover:underline">
               Report an issue
             </Link>
@@ -175,4 +175,4 @@ const CouchDetail = () => {
   );
 };
 
-export default CouchDetail;
+export default GamingTableDetail;

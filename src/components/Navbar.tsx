@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MapPin, Menu, User, Sofa } from "lucide-react";
+import { Search, MapPin, Menu, User, Dices } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +16,9 @@ const Navbar = () => {
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center gap-2 font-semibold text-xl">
             <div className="bg-primary p-1 rounded-md text-white">
-              <Sofa className="h-6 w-6" />
+              <Dices className="h-6 w-6" />
             </div>
-            <span className="hidden sm:inline-block">CouchFinder</span>
+            <span className="hidden sm:inline-block">TableFinder</span>
           </Link>
         </div>
 
@@ -27,7 +27,7 @@ const Navbar = () => {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search nearby couches..."
+              placeholder="Search nearby tables..."
               className="w-full bg-background pl-8 rounded-full"
             />
           </div>
