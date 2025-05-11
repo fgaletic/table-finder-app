@@ -17,19 +17,24 @@ export interface GamingVenue {
 export interface GamingTable {
   id: string;
   name: string;
-  description?: string; // Optional since venue might already describe it
-  images?: string[];    // Optional, could inherit from venue
+  description?: string; 
+  images?: string[];    
   availability: {
     status: "available" | "occupied" | "maintenance";
     until?: string;
   };
-  capacity?: number;    // How many people can sit here
-  tableNumber?: string; // E.g., "Table 3" or "Corner Booth"
+  capacity?: number;    
+  tableNumber?: string; 
   location?: {
     address: string;
-    coordinates: [number, number]; // [longitude, latitude]
+    coordinates: [number, number]; 
   };
-  amenities?: string[]; // Optional amenities for the table
+  amenities?: string[]; 
+  distance?: number;
+  rating?: number;
+  reviewCount?: number;
+  host_id?: string;
+  venueAddress?: string;
 }
 
 const mockGamingVenues: GamingVenue[] = [
@@ -58,6 +63,8 @@ const mockGamingVenues: GamingVenue[] = [
           address: "123 Main St, Downtown",
           coordinates: [-74.006, 40.7128],
         },
+        distance: 350,
+        rating: 4.8
       },
       {
         id: "v1-t2",
@@ -70,6 +77,8 @@ const mockGamingVenues: GamingVenue[] = [
           address: "123 Main St, Downtown",
           coordinates: [-74.006, 40.7128],
         },
+        distance: 350,
+        rating: 4.8
       }
     ]
   },
@@ -98,6 +107,8 @@ const mockGamingVenues: GamingVenue[] = [
           address: "456 Shopping Mall, Upper Level",
           coordinates: [-73.986, 40.7328],
         },
+        distance: 620,
+        rating: 4.2
       },
       {
         id: "v2-t2",
@@ -110,6 +121,8 @@ const mockGamingVenues: GamingVenue[] = [
           address: "456 Shopping Mall, Upper Level",
           coordinates: [-73.986, 40.7328],
         },
+        distance: 620,
+        rating: 4.2
       }
     ]
   },
@@ -138,6 +151,8 @@ const mockGamingVenues: GamingVenue[] = [
           address: "789 University Ave",
           coordinates: [-74.106, 40.7528],
         },
+        distance: 850,
+        rating: 4.5
       },
       {
         id: "v3-t2",
@@ -150,6 +165,8 @@ const mockGamingVenues: GamingVenue[] = [
           address: "789 University Ave",
           coordinates: [-74.106, 40.7528],
         },
+        distance: 850,
+        rating: 4.5
       }
     ]
   }
@@ -169,7 +186,9 @@ const standaloneGamingTables: GamingTable[] = [
     location: {
       address: "123 Library St",
       coordinates: [-74.005, 40.7135],
-    }
+    },
+    distance: 500,
+    rating: 4.5
   },
   {
     id: "st2",
@@ -183,7 +202,9 @@ const standaloneGamingTables: GamingTable[] = [
     location: {
       address: "789 Hotel Ave",
       coordinates: [-74.002, 40.7100],
-    }
+    },
+    distance: 800,
+    rating: 4.7
   }
 ];
 
@@ -269,9 +290,9 @@ export const getGamingTableById = (id: string): Promise<GamingTable | undefined>
   });
 };
 
-export const getAllAvailableTables = (): Promise<(GamingTable & { venueId?: string, venueName?: string, distance?: number, rating?: number })[]> => {
+export const getAllAvailableTables = (): Promise<(GamingTable & { venueId?: string, venueName?: string })[]> => {
   return new Promise((resolve) => {
-    const allTables: (GamingTable & { venueId?: string, venueName?: string, distance?: number, rating?: number })[] = [];
+    const allTables: (GamingTable & { venueId?: string, venueName?: string })[] = [];
 
     // Venue tables
     mockGamingVenues.forEach(venue => {
@@ -280,20 +301,16 @@ export const getAllAvailableTables = (): Promise<(GamingTable & { venueId?: stri
           ...table,
           venueId: venue.id,
           venueName: venue.name,
-          venueAddress: venue.location.address, // <-- add this
+          venueAddress: venue.location.address,
           distance: venue.distance,
           rating: venue.rating
         });
       });
     });
 
-    // Standalone tables (add mock distance/rating if needed)
+    // Standalone tables
     standaloneGamingTables.forEach(table => {
-      allTables.push({
-        ...table,
-        distance: table.distance ?? 500, // fallback value
-        rating: table.rating ?? 4        // fallback value
-      });
+      allTables.push(table);
     });
 
     setTimeout(() => resolve(allTables), 500);

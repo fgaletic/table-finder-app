@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SliderPicker } from "@/components/SliderPicker";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import React from "react";
 
 const Home = () => {
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
@@ -33,7 +34,7 @@ const Home = () => {
       // Calculate mock distance (replace with real calculation in production)
       const distance = calculateDistance(
         userLocation,
-        table.location.coordinates
+        table.location ? table.location.coordinates : [-74.0060, 40.7128]
       );
       
       return {

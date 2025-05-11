@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { GamingTable } from "@/services/gamingTableData";
 import { Badge } from "@/components/ui/badge";
 import { Dices } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface GamingTableListItemProps {
   table: GamingTable & { 
@@ -47,7 +48,7 @@ const GamingTableListItem = ({ table }: GamingTableListItemProps) => {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
-                {table.location.address}
+                {table.location?.address || table.venueAddress || "No address available"}
               </p>
             </div>
             <div className="flex justify-between items-end">
@@ -64,7 +65,14 @@ const GamingTableListItem = ({ table }: GamingTableListItemProps) => {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs">{table.distance}m</span>
+                {table.distance !== undefined && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="text-xs cursor-help">{table.distance}m</span>
+                    </TooltipTrigger>
+                    <TooltipContent>Distance from your location</TooltipContent>
+                  </Tooltip>
+                )}
                 <div className={`w-2 h-2 rounded-full ${availabilityColor}`}></div>
               </div>
             </div>

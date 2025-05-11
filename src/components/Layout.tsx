@@ -2,6 +2,7 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import React from "react";
 
 const Layout = () => {
   return (

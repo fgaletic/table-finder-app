@@ -9,26 +9,30 @@ import GamingTableDetail from "./pages/GamingTableDetail";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
+import React from "react";
 
+// Create a client
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="gamingTable/:id" element={<GamingTableDetail />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="gamingTable/:id" element={<GamingTableDetail />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </TooltipProvider>
       </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
