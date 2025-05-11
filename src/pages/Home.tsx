@@ -39,7 +39,7 @@ const Home = () => {
       return {
         ...table,
         distance: Math.round(distance * 1000), // Convert km to meters
-      };
+      } as GamingTable & { distance: number };
     });
   }, [tables]);
 

@@ -43,7 +43,7 @@ export const fetchGamingTables = async () => {
     throw error;
   }
   
-  // Transform to match our existing GamingTable interface
+  // Transform to match our existing GamingTable interface with proper type casting
   return data.map(table => ({
     id: table.id,
     name: table.name,
@@ -54,7 +54,7 @@ export const fetchGamingTables = async () => {
     },
     images: table.images || ["/placeholder.svg"],
     availability: {
-      status: table.availability_status,
+      status: (table.availability_status || "available") as "available" | "occupied" | "maintenance",
       until: table.availability_until,
     },
     capacity: table.capacity,
@@ -103,7 +103,7 @@ export const fetchGamingTableWithHost = async (id: string) => {
       },
       images: tableData.images || ["/placeholder.svg"],
       availability: {
-        status: tableData.availability_status,
+        status: (tableData.availability_status || "available") as "available" | "occupied" | "maintenance",
         until: tableData.availability_until,
       },
       capacity: tableData.capacity,
