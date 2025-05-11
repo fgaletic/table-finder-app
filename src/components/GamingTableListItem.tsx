@@ -53,14 +53,19 @@ const GamingTableListItem = ({ table }: GamingTableListItemProps) => {
             </div>
             <div className="flex justify-between items-end">
               <div className="flex flex-wrap gap-1.5">
-                {table.amenities && table.amenities.slice(0, 2).map((amenity) => (
+                {table.capacity && (
+                  <Badge variant="outline" className="text-[10px] py-0">
+                    {table.capacity} players
+                  </Badge>
+                )}
+                {table.amenities && table.amenities.slice(0, 1).map((amenity) => (
                   <Badge key={amenity} variant="secondary" className="text-[10px] py-0">
                     {amenity}
                   </Badge>
                 ))}
-                {table.amenities && table.amenities.length > 2 && (
+                {table.amenities && table.amenities.length > 1 && (
                   <Badge variant="outline" className="text-[10px] py-0">
-                    +{table.amenities.length - 2}
+                    +{table.amenities.length - 1}
                   </Badge>
                 )}
               </div>

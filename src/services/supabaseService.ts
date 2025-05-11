@@ -9,6 +9,7 @@ export interface Host {
   bio?: string;
   phone?: string;
   avatar_url?: string;
+  is_business?: boolean; // Flag to indicate if the host is a business or private individual
 }
 
 export interface Booking {
@@ -63,6 +64,9 @@ export const fetchGamingTables = async () => {
     reviewCount: table.review_count,
     distance: 0, // Will be calculated based on user location
     host_id: table.host_id,
+    // We intentionally don't add fields like "venueId" or "venueName" here
+    // to avoid biasing towards venues. Instead, host information can indicate
+    // if this is a private table or part of a commercial venue
   }));
 };
 
