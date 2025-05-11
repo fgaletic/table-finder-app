@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { GamingTable } from "@/services/gamingTableData";
 import { fetchGamingTables } from "@/services/supabaseService";
@@ -10,7 +10,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SliderPicker } from "@/components/SliderPicker";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import React from "react";
 
 const Home = () => {
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
@@ -24,7 +23,7 @@ const Home = () => {
   });
 
   // Process tables to add distance based on user location
-  const processedTables = React.useMemo(() => {
+  const processedTables = useMemo(() => {
     if (!tables) return [];
     
     // Mock user location (New York City)
