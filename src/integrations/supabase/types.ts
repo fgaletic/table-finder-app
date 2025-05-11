@@ -9,7 +9,187 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          start_time: string
+          status: string
+          table_id: string
+          user_email: string
+          user_name: string
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          start_time: string
+          status?: string
+          table_id: string
+          user_email: string
+          user_name: string
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          status?: string
+          table_id?: string
+          user_email?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "gaming_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gaming_tables: {
+        Row: {
+          amenities: string[] | null
+          availability_status: string
+          availability_until: string | null
+          capacity: number | null
+          created_at: string
+          description: string | null
+          host_id: string | null
+          id: string
+          images: string[] | null
+          latitude: number
+          location_address: string
+          longitude: number
+          name: string
+          rating: number | null
+          review_count: number | null
+        }
+        Insert: {
+          amenities?: string[] | null
+          availability_status?: string
+          availability_until?: string | null
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          host_id?: string | null
+          id?: string
+          images?: string[] | null
+          latitude?: number
+          location_address: string
+          longitude?: number
+          name: string
+          rating?: number | null
+          review_count?: number | null
+        }
+        Update: {
+          amenities?: string[] | null
+          availability_status?: string
+          availability_until?: string | null
+          capacity?: number | null
+          created_at?: string
+          description?: string | null
+          host_id?: string | null
+          id?: string
+          images?: string[] | null
+          latitude?: number
+          location_address?: string
+          longitude?: number
+          name?: string
+          rating?: number | null
+          review_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gaming_tables_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "hosts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hosts: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          created_at: string
+          host_id: string
+          id: string
+          message: string
+          read: boolean
+          sender_email: string
+          sender_name: string
+          table_id: string
+        }
+        Insert: {
+          created_at?: string
+          host_id: string
+          id?: string
+          message: string
+          read?: boolean
+          sender_email: string
+          sender_name: string
+          table_id: string
+        }
+        Update: {
+          created_at?: string
+          host_id?: string
+          id?: string
+          message?: string
+          read?: boolean
+          sender_email?: string
+          sender_name?: string
+          table_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_host_id_fkey"
+            columns: ["host_id"]
+            isOneToOne: false
+            referencedRelation: "hosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_table_id_fkey"
+            columns: ["table_id"]
+            isOneToOne: false
+            referencedRelation: "gaming_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

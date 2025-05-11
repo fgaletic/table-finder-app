@@ -5,29 +5,65 @@ import { Dices, MapPin } from "lucide-react";
 
 interface GamingTableMapProps {
   // Update to match the return type of getAllAvailableTables
-  gamingTables: (GamingTable & { venueId?: string, venueName?: string, distance?: number, rating?: number })[];
+  gamingTables: (GamingTable & { 
+    venueId?: string, 
+    venueName?: string, 
+    distance?: number, 
+    rating?: number 
+  })[];
   isLoading?: boolean;
 }
 
-// Simple mock map component (in a real app we'd use a real map library)
 const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps) => {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  
+  // Convert longitude, latitude to X, Y positions on our mock map
+  const getPositionFromCoordinates = (coords: [number, number]) => {
+    // NYC coordinates as center reference point (approx)
+    const centerLng = -74.0060; 
+    const centerLat = 40.7128;
+    
+    // Scale factors - adjust these to control sensitivity of map movements
+    // These are arbitrary values that work for our mock map display
+    const lngScale = 400; // Controls horizontal spread
+    const latScale = 300; // Controls vertical spread
+    
+    // Calculate percentage position within our map view
+    // We add an offset to make the positions more centered on the map
+    const x = 50 + ((coords[0] - centerLng) * lngScale);
+    const y = 50 - ((coords[1] - centerLat) * latScale); // Invert Y since map coordinates go from bottom to top
+    
+    // Keep within bounds (10-90% of container to avoid edges)
+    const boundedX = Math.max(10, Math.min(90, x));
+    const boundedY = Math.max(10, Math.min(90, y));
+    
+    return { posX: `${boundedX}%`, posY: `${boundedY}%` };
+  };
 
-  // Position gaming tables on the "map"
+  // Position gaming tables on the map
   const positionGamingTables = () => {
-    // Add explicit null/undefined check with fallback to empty array
     if (!gamingTables || !Array.isArray(gamingTables)) {
       return [];
     }
     
-    return gamingTables.map(gamingTable => {
-      // Create a deterministic but somewhat random position based on the gaming table id
-      const idSum = gamingTable.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const x = (idSum % 80) + 10; // Keep within 10-90% of width
-      const y = ((idSum * 7) % 80) + 10; // Different pattern for y, also 10-90%
+    return gamingTables.map(table => {
+      // Use real coordinates if available, otherwise fall back to an algorithm
+      let posX = "50%";
+      let posY = "50%";
       
-      return { ...gamingTable, posX: `${x}%`, posY: `${y}%` };
+      if (table.location && table.location.coordinates) {
+        const position = getPositionFromCoordinates(table.location.coordinates);
+        posX = position.posX;
+        posY = position.posY;
+      } else {
+        // Fall back to our previous algorithm for tables without coordinates
+        const idSum = table.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        posX = `${(idSum % 80) + 10}%`;
+        posY = `${((idSum * 7) % 80) + 10}%`;
+      }
+      
+      return { ...table, posX, posY };
     });
   };
 
@@ -35,8 +71,6 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
 
   const handleMarkerClick = (id: string) => {
     setSelectedId(id);
-    // Optional: navigate to gaming table detail
-    // navigate(`/gamingTable/${id}`);
   };
 
   // Clear selection when gaming tables change
@@ -77,7 +111,7 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
         </div>
       </div>
       
-      {/* Table markers - Updated to handle possibly missing properties */}
+      {/* Table markers */}
       {positionedGamingTables.map((gamingTable) => {
         const isSelected = selectedId === gamingTable.id;
         const isAvailable = gamingTable.availability.status === "available";
@@ -102,16 +136,13 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
               {isSelected && (
                 <div className="absolute top-full mt-2 bg-white p-2 rounded-lg shadow-lg w-48 z-10">
                   <div className="text-xs font-medium">{gamingTable.name}</div>
-                  {/* Show venue name if it exists */}
                   {gamingTable.venueName && (
                     <div className="text-xs text-muted-foreground">{gamingTable.venueName}</div>
                   )}
-                  {/* Only show distance if it exists */}
                   {gamingTable.distance !== undefined && (
                     <div className="text-xs text-muted-foreground mt-0.5">{gamingTable.distance}m away</div>
                   )}
                   <div className="flex justify-between items-center mt-1">
-                    {/* Only show rating if it exists */}
                     {gamingTable.rating !== undefined && (
                       <div className="flex items-center gap-1">
                         <span className="text-xs">{gamingTable.rating}</span>

@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getGamingTables, GamingTable, getAllAvailableTables } from "@/services/gamingTableData";
+import { GamingTable } from "@/services/gamingTableData";
+import { fetchGamingTables } from "@/services/supabaseService";
 import GamingTableListItem from "@/components/GamingTableListItem";
 import GamingTableMap from "@/components/GamingTableMap";
 import { Button } from "@/components/ui/button";
@@ -14,17 +16,57 @@ const Home = () => {
   const [maxDistance, setMaxDistance] = useState<number>(1500);
   const [minRating, setMinRating] = useState<number>(3);
 
+  // Fetch tables from Supabase
   const { data: tables, isLoading, error, refetch } = useQuery({
     queryKey: ["gamingTables"],
-    queryFn: getGamingTables,
+    queryFn: fetchGamingTables,
   });
 
-  const { data: availableTables, isLoading: isAvailableTablesLoading } = useQuery({
-    queryKey: ['availableTables'],
-    queryFn: getAllAvailableTables
-  });
+  // Process tables to add distance based on user location
+  const processedTables = React.useMemo(() => {
+    if (!tables) return [];
+    
+    // Mock user location (New York City)
+    const userLocation: [number, number] = [-74.0060, 40.7128];
+    
+    return tables.map(table => {
+      // Calculate mock distance (replace with real calculation in production)
+      const distance = calculateDistance(
+        userLocation,
+        table.location.coordinates
+      );
+      
+      return {
+        ...table,
+        distance: Math.round(distance * 1000), // Convert km to meters
+      };
+    });
+  }, [tables]);
 
-  const filteredTables = (availableTables || []).filter(
+  // Calculate distance between two points in km
+  function calculateDistance(
+    coords1: [number, number],
+    coords2: [number, number]
+  ): number {
+    // This is a simplified version (Haversine formula)
+    const R = 6371; // Earth's radius in km
+    const dLat = deg2rad(coords2[1] - coords1[1]);
+    const dLon = deg2rad(coords2[0] - coords1[0]);
+    
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(coords1[1])) * Math.cos(deg2rad(coords2[1])) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+  }
+
+  function deg2rad(deg: number): number {
+    return deg * (Math.PI / 180);
+  }
+
+  const filteredTables = (processedTables || []).filter(
     (table) =>
       (table.distance || 0) <= maxDistance &&
       (table.rating || 0) >= minRating
@@ -83,7 +125,7 @@ const Home = () => {
       {/* Content */}
       <div className={`flex flex-col md:flex-row gap-6 ${isLoading ? "opacity-60" : ""}`}>
         <div className={`h-[70vh] w-full md:w-3/5 rounded-lg overflow-hidden shadow-md ${viewMode === "list" ? "hidden md:block" : ""}`}>
-          <GamingTableMap gamingTables={filteredTables} isLoading={isAvailableTablesLoading} />
+          <GamingTableMap gamingTables={filteredTables} isLoading={isLoading} />
         </div>
         <div className={`w-full md:w-2/5 flex-shrink-0 ${viewMode === "map" ? "hidden md:block" : ""}`}>
           <div className="space-y-4">
@@ -91,7 +133,7 @@ const Home = () => {
               <h2 className="text-xl font-semibold">Available Gaming Tables</h2>
               <span className="text-sm text-muted-foreground">{filteredTables.length} found</span>
             </div>
-            {isAvailableTablesLoading ? (
+            {isLoading ? (
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="h-28 bg-muted animate-pulse-soft rounded-lg"></div>

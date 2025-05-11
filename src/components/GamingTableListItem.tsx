@@ -1,10 +1,16 @@
+
 import { Link } from "react-router-dom";
 import { GamingTable } from "@/services/gamingTableData";
 import { Badge } from "@/components/ui/badge";
 import { Dices } from "lucide-react";
 
 interface GamingTableListItemProps {
-  table: GamingTable;
+  table: GamingTable & { 
+    venueId?: string;
+    venueName?: string;
+    distance?: number;
+    rating?: number;
+  };
 }
 
 const GamingTableListItem = ({ table }: GamingTableListItemProps) => {
@@ -15,7 +21,7 @@ const GamingTableListItem = ({ table }: GamingTableListItemProps) => {
   }[table.availability.status];
 
   return (
-    <Link to={`/table/${table.id}`} className="block">
+    <Link to={`/gamingTable/${table.id}`} className="block">
       <div className="border rounded-lg overflow-hidden bg-card hover:bg-accent/50 transition-colors">
         <div className="flex">
           <div className="w-1/3 h-28 bg-muted flex items-center justify-center">
@@ -46,12 +52,12 @@ const GamingTableListItem = ({ table }: GamingTableListItemProps) => {
             </div>
             <div className="flex justify-between items-end">
               <div className="flex flex-wrap gap-1.5">
-                {table.amenities.slice(0, 2).map((amenity) => (
+                {table.amenities && table.amenities.slice(0, 2).map((amenity) => (
                   <Badge key={amenity} variant="secondary" className="text-[10px] py-0">
                     {amenity}
                   </Badge>
                 ))}
-                {table.amenities.length > 2 && (
+                {table.amenities && table.amenities.length > 2 && (
                   <Badge variant="outline" className="text-[10px] py-0">
                     +{table.amenities.length - 2}
                   </Badge>
