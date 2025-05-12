@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { GamingTable } from "@/services/gamingTableData";
 import { useNavigate } from "react-router-dom";
 import { Dices, MapPin } from "lucide-react";
@@ -14,6 +14,8 @@ interface GamingTableMapProps {
   isLoading?: boolean;
 }
 
+// We keep the existing mock map implementation
+// In a future update, we can replace this with a real map using Mapbox GL JS
 const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps) => {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -78,6 +80,7 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
     setSelectedId(null);
   }, [gamingTables]);
 
+  // Display a note about upgrading to a real map in the future
   return (
     <div className="map-container relative bg-blue-50 overflow-hidden">
       {/* Mock map background */}
@@ -94,6 +97,11 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
         <div className="absolute top-[20%] left-[60%] w-[25%] h-[10%] bg-gray-100 rounded-sm"></div>
         <div className="absolute top-[60%] left-[55%] w-[15%] h-[25%] bg-gray-100 rounded-sm"></div>
         <div className="absolute top-[40%] left-[85%] w-[10%] h-[10%] bg-gray-100 rounded-sm"></div>
+      </div>
+
+      {/* Banner about upgrading to Mapbox */}
+      <div className="absolute top-2 left-2 right-2 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-md text-sm text-center shadow-sm">
+        <p>Using mock map. Replace with Mapbox for accurate geographic display.</p>
       </div>
       
       {/* Loading overlay */}
