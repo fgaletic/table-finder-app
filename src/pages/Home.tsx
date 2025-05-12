@@ -26,14 +26,14 @@ const Home = () => {
   const processedTables = useMemo(() => {
     if (!tables) return [];
     
-    // Mock user location (New York City)
-    const userLocation: [number, number] = [-74.0060, 40.7128];
+    // Barcelona city center coordinates
+    const userLocation: [number, number] = [2.1734, 41.3851]; // Barcelona coordinates
     
     return tables.map(table => {
-      // Calculate mock distance (replace with real calculation in production)
+      // Calculate distance
       const distance = calculateDistance(
         userLocation,
-        table.location ? table.location.coordinates : [-74.0060, 40.7128]
+        table.location ? table.location.coordinates : [2.1734, 41.3851]
       );
       
       return {
@@ -89,7 +89,7 @@ const Home = () => {
   return (
     <div className="flex flex-col space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold tracking-tight">Find a Gaming Table</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Find a Gaming Table in Barcelona</h1>
         <Button size="sm" variant="outline" onClick={handleRefresh}>
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh
@@ -120,6 +120,16 @@ const Home = () => {
             formatter={(val) => `${val} ★`}
           />
         </div>
+      </div>
+
+      {/* Mobile view mode selector */}
+      <div className="md:hidden">
+        <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "map" | "list")}>
+          <TabsList className="w-full">
+            <TabsTrigger value="map" className="w-1/2">Map</TabsTrigger>
+            <TabsTrigger value="list" className="w-1/2">List</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Content */}

@@ -1,20 +1,23 @@
 
 import { toast } from "sonner";
 
-// You'll need to provide a Mapbox access token
-// This should be a public token that can be exposed in client-side code
-// See: https://docs.mapbox.com/help/getting-started/access-tokens/
-const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoibG92YWJsZS1kZW1vIiwiYSI6ImNsazE0dGVnbDBhYXYzZGticDdkZjRnb3YifQ.lb4OjDvAFznA3fCebOgSng";
-
 /**
  * Convert an address to coordinates using Mapbox geocoding API
  */
-export const geocodeAddress = async (address: string): Promise<[number, number] | null> => {
+export const geocodeAddress = async (address: string, token?: string): Promise<[number, number] | null> => {
   if (!address) return null;
+  
+  // If no token is provided, use the token from localStorage
+  const mapboxToken = token || localStorage.getItem("mapboxToken");
+  
+  if (!mapboxToken) {
+    toast.error("Mapbox token is missing. Please set your Mapbox token in the settings.");
+    return null;
+  }
   
   try {
     const encodedAddress = encodeURIComponent(address);
-    const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${MAPBOX_ACCESS_TOKEN}`);
+    const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${mapboxToken}`);
     
     if (!response.ok) {
       throw new Error(`Geocoding API returned status: ${response.status}`);
@@ -39,13 +42,21 @@ export const geocodeAddress = async (address: string): Promise<[number, number] 
 /**
  * Convert coordinates to an address using Mapbox reverse geocoding API
  */
-export const reverseGeocode = async (coordinates: [number, number]): Promise<string | null> => {
+export const reverseGeocode = async (coordinates: [number, number], token?: string): Promise<string | null> => {
   if (!coordinates) return null;
+  
+  // If no token is provided, use the token from localStorage
+  const mapboxToken = token || localStorage.getItem("mapboxToken");
+  
+  if (!mapboxToken) {
+    toast.error("Mapbox token is missing. Please set your Mapbox token in the settings.");
+    return null;
+  }
   
   try {
     const [longitude, latitude] = coordinates;
     const response = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}`
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxToken}`
     );
     
     if (!response.ok) {

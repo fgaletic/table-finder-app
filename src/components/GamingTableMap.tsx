@@ -1,10 +1,14 @@
+
 import { useState, useEffect, useRef } from "react";
 import { GamingTable } from "@/services/gamingTableData";
 import { useNavigate } from "react-router-dom";
-import { Dices, MapPin } from "lucide-react";
+import { Dices, MapPin, Settings } from "lucide-react";
+import { useMapToken } from "./MapTokenProvider";
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { Button } from "./ui/button";
 
 interface GamingTableMapProps {
-  // Update to match the return type of getAllAvailableTables
   gamingTables: (GamingTable & { 
     venueId?: string, 
     venueName?: string, 
@@ -14,165 +18,217 @@ interface GamingTableMapProps {
   isLoading?: boolean;
 }
 
-// We keep the existing mock map implementation
-// In a future update, we can replace this with a real map using Mapbox GL JS
 const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps) => {
   const navigate = useNavigate();
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<{[key: string]: mapboxgl.Marker}>({});
+  const popupsRef = useRef<{[key: string]: mapboxgl.Popup}>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  
-  // Convert longitude, latitude to X, Y positions on our mock map
-  const getPositionFromCoordinates = (coords: [number, number]) => {
-    // NYC coordinates as center reference point (approx)
-    const centerLng = -74.0060; 
-    const centerLat = 40.7128;
-    
-    // Scale factors - adjust these to control sensitivity of map movements
-    // These are arbitrary values that work for our mock map display
-    const lngScale = 400; // Controls horizontal spread
-    const latScale = 300; // Controls vertical spread
-    
-    // Calculate percentage position within our map view
-    // We add an offset to make the positions more centered on the map
-    const x = 50 + ((coords[0] - centerLng) * lngScale);
-    const y = 50 - ((coords[1] - centerLat) * latScale); // Invert Y since map coordinates go from bottom to top
-    
-    // Keep within bounds (10-90% of container to avoid edges)
-    const boundedX = Math.max(10, Math.min(90, x));
-    const boundedY = Math.max(10, Math.min(90, y));
-    
-    return { posX: `${boundedX}%`, posY: `${boundedY}%` };
-  };
+  const { mapboxToken, showTokenDialog } = useMapToken();
 
-  // Position gaming tables on the map
-  const positionGamingTables = () => {
-    if (!gamingTables || !Array.isArray(gamingTables)) {
-      return [];
-    }
-    
-    return gamingTables.map(table => {
-      // Use real coordinates if available, otherwise fall back to an algorithm
-      let posX = "50%";
-      let posY = "50%";
-      
-      if (table.location && table.location.coordinates) {
-        const position = getPositionFromCoordinates(table.location.coordinates);
-        posX = position.posX;
-        posY = position.posY;
-      } else {
-        // Fall back to our previous algorithm for tables without coordinates
-        const idSum = table.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        posX = `${(idSum % 80) + 10}%`;
-        posY = `${((idSum * 7) % 80) + 10}%`;
-      }
-      
-      return { ...table, posX, posY };
-    });
-  };
+  // Center on Barcelona
+  const defaultCenter: [number, number] = [2.1734, 41.3851];
 
-  const positionedGamingTables = positionGamingTables();
-
-  const handleMarkerClick = (id: string) => {
-    setSelectedId(id);
-  };
-
-  // Clear selection when gaming tables change
   useEffect(() => {
-    setSelectedId(null);
-  }, [gamingTables]);
+    if (!mapContainer.current || !mapboxToken) return;
+    
+    // If the map is already initialized, don't recreate it
+    if (map.current) return;
+    
+    // Initialize map
+    mapboxgl.accessToken = mapboxToken;
+    
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: defaultCenter,
+      zoom: 13,
+    });
 
-  // Display a note about upgrading to a real map in the future
-  return (
-    <div className="map-container relative bg-blue-50 overflow-hidden">
-      {/* Mock map background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100">
-        {/* Mock streets */}
-        <div className="absolute top-1/4 left-0 right-0 h-1 bg-gray-200"></div>
-        <div className="absolute top-2/3 left-0 right-0 h-0.5 bg-gray-200"></div>
-        <div className="absolute left-1/4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-        <div className="absolute left-3/4 top-0 bottom-0 w-1 bg-gray-200"></div>
+    // Add navigation controls
+    map.current.addControl(
+      new mapboxgl.NavigationControl(),
+      'top-right'
+    );
+
+    // Add geolocation control to center on user location
+    map.current.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        trackUserLocation: true
+      }),
+      'top-right'
+    );
+
+    // Clean up on unmount
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, [mapContainer, mapboxToken]);
+
+  // Update markers when gaming tables change
+  useEffect(() => {
+    if (!map.current || !mapboxToken || !gamingTables.length) return;
+
+    // Clear any existing markers
+    Object.values(markersRef.current).forEach(marker => marker.remove());
+    markersRef.current = {};
+    
+    // Clear any existing popups
+    Object.values(popupsRef.current).forEach(popup => popup.remove());
+    popupsRef.current = {};
+
+    // Add markers for each gaming table
+    gamingTables.forEach(table => {
+      // Only add marker if we have coordinates
+      if (table.location && table.location.coordinates) {
+        const coordinates = table.location.coordinates; // [longitude, latitude]
         
-        {/* Mock buildings */}
-        <div className="absolute top-[15%] left-[10%] w-[15%] h-[20%] bg-gray-100 rounded-sm"></div>
-        <div className="absolute top-[45%] left-[20%] w-[10%] h-[15%] bg-gray-100 rounded-sm"></div>
-        <div className="absolute top-[20%] left-[60%] w-[25%] h-[10%] bg-gray-100 rounded-sm"></div>
-        <div className="absolute top-[60%] left-[55%] w-[15%] h-[25%] bg-gray-100 rounded-sm"></div>
-        <div className="absolute top-[40%] left-[85%] w-[10%] h-[10%] bg-gray-100 rounded-sm"></div>
-      </div>
+        // Create a popup
+        const popup = new mapboxgl.Popup({ offset: 25, closeButton: false })
+          .setHTML(`
+            <div style="padding: 8px;">
+              <div style="font-weight: 500; margin-bottom: 4px;">${table.name}</div>
+              ${table.venueName ? `<div style="font-size: 12px; color: #666;">${table.venueName}</div>` : ''}
+              ${table.distance !== undefined ? `<div style="font-size: 12px; color: #666; margin-top: 4px;">${table.distance}m away</div>` : ''}
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                ${table.rating !== undefined ? 
+                `<div style="display: flex; align-items: center; gap: 4px;">
+                  <span style="font-size: 12px;">${table.rating}</span>
+                  <span style="color: #f59e0b; font-size: 12px;">★</span>
+                </div>` : ''}
+                <a href="/gamingTable/${table.id}" style="font-size: 12px; color: #0d6efd; text-decoration: none; margin-left: 8px;">
+                  View Details
+                </a>
+              </div>
+            </div>
+          `);
+        
+        popupsRef.current[table.id] = popup;
+        
+        // Create HTML element for marker
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.width = '30px';
+        el.style.height = '30px';
+        el.style.borderRadius = '50%';
+        el.style.backgroundColor = getMarkerColor(table.availability.status);
+        el.style.display = 'flex';
+        el.style.justifyContent = 'center';
+        el.style.alignItems = 'center';
+        el.style.cursor = 'pointer';
+        el.style.boxShadow = '0 0 0 2px white, 0 0 0 4px rgba(0,0,0,0.1)';
+        el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: white;"><path d="M2 16V15a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1M8 7H6a2 2 0 0 0-2 2v1"/><path d="M18 7h2a2 2 0 0 1 2 2v1"/><path d="M16 15v1a2 2 0 0 0 2 2h.5"/><path d="M7.5 20H2v-1a2 2 0 0 1 2-2h1.9"/><path d="M12 12v-1.5a2.5 2.5 0 0 1 5 0V12"/><rect x="12" y="11" width="5" height="10" rx="1"/></svg>';
 
-      {/* Banner about upgrading to Mapbox */}
-      <div className="absolute top-2 left-2 right-2 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-md text-sm text-center shadow-sm">
-        <p>Using mock map. Replace with Mapbox for accurate geographic display.</p>
-      </div>
+        // Create and add the marker
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat(coordinates)
+          .setPopup(popup)
+          .addTo(map.current!);
+        
+        markersRef.current[table.id] = marker;
+        
+        // Event listeners
+        el.addEventListener('mouseenter', () => {
+          popup.addTo(map.current!);
+        });
+        
+        el.addEventListener('mouseleave', () => {
+          if (selectedId !== table.id) {
+            popup.remove();
+          }
+        });
+        
+        el.addEventListener('click', () => {
+          if (selectedId === table.id) {
+            setSelectedId(null);
+            popup.remove();
+          } else {
+            // Close any open popup
+            if (selectedId && popupsRef.current[selectedId]) {
+              popupsRef.current[selectedId].remove();
+            }
+            
+            setSelectedId(table.id);
+            popup.addTo(map.current!);
+            
+            // Center map on the marker
+            map.current!.flyTo({
+              center: coordinates,
+              zoom: 15,
+              essential: true
+            });
+          }
+        });
+      }
+    });
+    
+    // Fit bounds to include all markers if there are any
+    if (Object.keys(markersRef.current).length > 0) {
+      const bounds = new mapboxgl.LngLatBounds();
+      Object.values(markersRef.current).forEach(marker => {
+        bounds.extend(marker.getLngLat());
+      });
+      map.current.fitBounds(bounds, {
+        padding: 100,
+        maxZoom: 15
+      });
+    }
+  }, [gamingTables, mapboxToken, selectedId]);
+
+  // Helper function to get marker color based on availability status
+  const getMarkerColor = (status: string): string => {
+    switch (status) {
+      case 'available': return '#10b981'; // green
+      case 'occupied': return '#f59e0b'; // amber
+      case 'maintenance': return '#ef4444'; // red
+      default: return '#6b7280'; // gray
+    }
+  };
+
+  return (
+    <div className="relative h-full w-full overflow-hidden rounded-lg">
+      {/* If no token is set, show token request banner */}
+      {!mapboxToken && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/80 backdrop-blur-sm z-50 p-4">
+          <div className="bg-background rounded-lg shadow-lg p-6 max-w-md text-center">
+            <h3 className="text-lg font-semibold mb-2">Mapbox Token Required</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              To display the map, please set your Mapbox token.
+            </p>
+            <Button onClick={showTokenDialog}>
+              Set Mapbox Token
+            </Button>
+          </div>
+        </div>
+      )}
       
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-20">
           <div className="animate-pulse-soft text-primary">Loading map data...</div>
         </div>
       )}
       
-      {/* User location (center of map) */}
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <div className="relative">
-          <div className="absolute -inset-4 bg-primary/20 rounded-full animate-pulse-soft"></div>
-          <div className="w-4 h-4 bg-primary rounded-full border-2 border-white"></div>
-        </div>
-      </div>
+      {/* Map container */}
+      <div ref={mapContainer} className="h-full w-full bg-blue-50" />
       
-      {/* Table markers */}
-      {positionedGamingTables.map((gamingTable) => {
-        const isSelected = selectedId === gamingTable.id;
-        const isAvailable = gamingTable.availability.status === "available";
-        const color = isAvailable ? "text-green-500" : "text-amber-500";
-        const size = isSelected ? "scale-125" : "scale-100";
-        
-        return (
-          <div
-            key={gamingTable.id}
-            className={`absolute cursor-pointer transition-all ${size}`}
-            style={{ top: gamingTable.posY, left: gamingTable.posX }}
-            onClick={() => handleMarkerClick(gamingTable.id)}
-          >
-            <div className="relative flex items-center justify-center">
-              {isSelected && (
-                <div className="absolute -inset-3 bg-primary/20 rounded-full animate-pulse-soft"></div>
-              )}
-              <div className={`${color} bg-white p-1 rounded-full shadow-md`}>
-                <Dices className="h-5 w-5" />
-              </div>
-              
-              {isSelected && (
-                <div className="absolute top-full mt-2 bg-white p-2 rounded-lg shadow-lg w-48 z-10">
-                  <div className="text-xs font-medium">{gamingTable.name}</div>
-                  {gamingTable.venueName && (
-                    <div className="text-xs text-muted-foreground">{gamingTable.venueName}</div>
-                  )}
-                  {gamingTable.distance !== undefined && (
-                    <div className="text-xs text-muted-foreground mt-0.5">{gamingTable.distance}m away</div>
-                  )}
-                  <div className="flex justify-between items-center mt-1">
-                    {gamingTable.rating !== undefined && (
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs">{gamingTable.rating}</span>
-                        <span className="text-yellow-500 text-xs">★</span>
-                      </div>
-                    )}
-                    <button
-                      className="text-xs text-primary hover:underline"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/gamingTable/${gamingTable.id}`);
-                      }}
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
+      {/* Map settings button */}
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="absolute top-3 left-3 z-10 bg-white"
+        onClick={showTokenDialog}
+      >
+        <Settings className="h-4 w-4 mr-2" />
+        Map Settings
+      </Button>
     </div>
   );
 };
