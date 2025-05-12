@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { GamingTable } from "@/services/gamingTableData";
 import { useNavigate } from "react-router-dom";
-import { Dices, MapPin, Settings } from "lucide-react";
+import { Dices, MapPin, Settings, ExternalLink } from "lucide-react";
 import { useMapToken } from "./MapTokenProvider";
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -25,43 +25,62 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
   const markersRef = useRef<{[key: string]: mapboxgl.Marker}>({});
   const popupsRef = useRef<{[key: string]: mapboxgl.Popup}>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const { mapboxToken, showTokenDialog } = useMapToken();
+  const { mapboxToken, showTokenDialog, isTokenValid } = useMapToken();
+  const [mapError, setMapError] = useState<string | null>(null);
 
   // Center on Barcelona
   const defaultCenter: [number, number] = [2.1734, 41.3851];
 
   useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
+    if (!mapContainer.current) return;
+    if (!mapboxToken) return;
+    if (!isTokenValid) return;
     
     // If the map is already initialized, don't recreate it
     if (map.current) return;
     
-    // Initialize map
-    mapboxgl.accessToken = mapboxToken;
-    
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: defaultCenter,
-      zoom: 13,
-    });
+    try {
+      // Initialize map
+      mapboxgl.accessToken = mapboxToken;
+      
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: defaultCenter,
+        zoom: 13,
+      });
 
-    // Add navigation controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl(),
-      'top-right'
-    );
+      // Add error handling
+      map.current.on('error', (e) => {
+        console.error("Mapbox error:", e);
+        setMapError(`Map error: ${e.error?.message || 'Unknown error'}`);
+      });
 
-    // Add geolocation control to center on user location
-    map.current.addControl(
-      new mapboxgl.GeolocateControl({
-        positionOptions: {
-          enableHighAccuracy: true
-        },
-        trackUserLocation: true
-      }),
-      'top-right'
-    );
+      // Add navigation controls
+      map.current.addControl(
+        new mapboxgl.NavigationControl(),
+        'top-right'
+      );
+
+      // Add geolocation control to center on user location
+      map.current.addControl(
+        new mapboxgl.GeolocateControl({
+          positionOptions: {
+            enableHighAccuracy: true
+          },
+          trackUserLocation: true
+        }),
+        'top-right'
+      );
+
+      // Clear any error when map loads successfully
+      map.current.on('load', () => {
+        setMapError(null);
+      });
+    } catch (error) {
+      console.error("Error initializing map:", error);
+      setMapError(`Failed to initialize map: ${(error as Error).message}`);
+    }
 
     // Clean up on unmount
     return () => {
@@ -70,11 +89,28 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
         map.current = null;
       }
     };
-  }, [mapContainer, mapboxToken]);
+  }, [mapContainer, mapboxToken, isTokenValid]);
 
   // Update markers when gaming tables change
   useEffect(() => {
-    if (!map.current || !mapboxToken || !gamingTables.length) return;
+    if (!map.current || !mapboxToken || !isTokenValid || !gamingTables.length) return;
+
+    try {
+      // Wait for map to be ready
+      if (!map.current.loaded()) {
+        map.current.once('load', () => updateMarkers());
+      } else {
+        updateMarkers();
+      }
+    } catch (error) {
+      console.error("Error updating markers:", error);
+      setMapError(`Failed to update markers: ${(error as Error).message}`);
+    }
+  }, [gamingTables, mapboxToken, isTokenValid, selectedId]);
+
+  // Function to update markers
+  const updateMarkers = () => {
+    if (!map.current) return;
 
     // Clear any existing markers
     Object.values(markersRef.current).forEach(marker => marker.remove());
@@ -180,7 +216,7 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
         maxZoom: 15
       });
     }
-  }, [gamingTables, mapboxToken, selectedId]);
+  };
 
   // Helper function to get marker color based on availability status
   const getMarkerColor = (status: string): string => {
@@ -194,18 +230,43 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-lg">
-      {/* If no token is set, show token request banner */}
-      {!mapboxToken && (
+      {/* If no token is set or token is invalid, show token request banner */}
+      {(!mapboxToken || !isTokenValid) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/80 backdrop-blur-sm z-50 p-4">
           <div className="bg-background rounded-lg shadow-lg p-6 max-w-md text-center">
-            <h3 className="text-lg font-semibold mb-2">Mapbox Token Required</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              {!mapboxToken ? "Mapbox Token Required" : "Invalid Mapbox Token"}
+            </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              To display the map, please set your Mapbox token.
+              {!mapboxToken 
+                ? "To display the map, please set your Mapbox token."
+                : "Your current Mapbox token is invalid. Please update it."}
             </p>
-            <Button onClick={showTokenDialog}>
-              Set Mapbox Token
-            </Button>
+            <div className="space-y-4">
+              <Button onClick={showTokenDialog} className="w-full">
+                {!mapboxToken ? "Set Mapbox Token" : "Update Token"}
+              </Button>
+              <a 
+                href="https://account.mapbox.com/access-tokens/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center text-sm text-blue-500 hover:underline gap-1"
+              >
+                Get free Mapbox token
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
           </div>
+        </div>
+      )}
+      
+      {/* Map error message */}
+      {mapError && isTokenValid && (
+        <div className="absolute top-14 left-1/2 transform -translate-x-1/2 bg-red-50 text-red-700 px-4 py-2 rounded-md shadow-lg z-20 flex items-center">
+          <span>{mapError}</span>
+          <Button variant="link" onClick={showTokenDialog} className="ml-2 p-0 h-auto text-red-700">
+            Update Token
+          </Button>
         </div>
       )}
       

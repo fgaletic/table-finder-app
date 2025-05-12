@@ -1,14 +1,16 @@
 
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { toast } from "sonner";
+import { ExternalLink } from "lucide-react";
 
 interface MapTokenContextType {
-  mapboxToken: string;
+  mapboxToken: string | null;
   setMapboxToken: (token: string) => void;
   isTokenSet: boolean;
+  isTokenValid: boolean;
   showTokenDialog: () => void;
 }
 
@@ -24,45 +26,83 @@ export const useMapToken = () => {
 
 interface MapTokenProviderProps {
   children: ReactNode;
-  defaultToken?: string;
 }
 
-// This is a fallback public token for demo purposes
-// In production, you should use your own token or fetch from environment variables
-const DEMO_TOKEN = "pk.eyJ1IjoibG92YWJsZS1kZW1vIiwiYSI6ImNsazE0dGVnbDBhYXYzZGticDdkZjRnb3YifQ.lb4OjDvAFznA3fCebOgSng";
-
 export const MapTokenProvider = ({ 
-  children, 
-  defaultToken = DEMO_TOKEN 
+  children
 }: MapTokenProviderProps) => {
   // Try to get token from localStorage first
   const storedToken = typeof window !== "undefined" ? localStorage.getItem("mapboxToken") : null;
   
-  const [mapboxToken, setMapboxTokenState] = useState<string>(storedToken || defaultToken);
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [mapboxToken, setMapboxTokenState] = useState<string | null>(storedToken);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(!storedToken);
+  const [isTokenValid, setIsTokenValid] = useState<boolean>(false);
 
   const setMapboxToken = (token: string) => {
+    // Skip empty tokens
+    if (!token.trim()) {
+      toast.error("Please enter a valid Mapbox token");
+      return;
+    }
+    
     // Store token in localStorage for persistence
     if (typeof window !== "undefined") {
       localStorage.setItem("mapboxToken", token);
     }
     setMapboxTokenState(token);
-    toast.success("Mapbox token updated successfully!");
+    toast.success("Mapbox token updated successfully! Validating token...");
+    
+    // Attempt to validate the token
+    validateMapboxToken(token);
   };
+
+  // Function to validate mapbox token
+  const validateMapboxToken = async (token: string) => {
+    try {
+      // Try to fetch a style to test the token
+      const response = await fetch(
+        `https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token=${token}`
+      );
+      
+      if (response.ok) {
+        setIsTokenValid(true);
+        toast.success("Mapbox token is valid!");
+      } else {
+        setIsTokenValid(false);
+        toast.error("Invalid Mapbox token. Please check and try again.");
+      }
+    } catch (error) {
+      setIsTokenValid(false);
+      toast.error("Error validating Mapbox token. Please check your network connection.");
+    }
+  };
+
+  // Validate token on mount
+  useEffect(() => {
+    if (mapboxToken) {
+      validateMapboxToken(mapboxToken);
+    }
+  }, []);
 
   const showTokenDialog = () => {
     setIsDialogOpen(true);
   };
 
-  const isTokenSet = mapboxToken !== "";
+  const isTokenSet = !!mapboxToken;
 
   return (
-    <MapTokenContext.Provider value={{ mapboxToken, setMapboxToken, isTokenSet, showTokenDialog }}>
+    <MapTokenContext.Provider value={{ 
+      mapboxToken, 
+      setMapboxToken, 
+      isTokenSet, 
+      isTokenValid, 
+      showTokenDialog 
+    }}>
       {children}
       <TokenDialog 
         isOpen={isDialogOpen} 
         onClose={() => setIsDialogOpen(false)} 
-        currentToken={mapboxToken}
+        currentToken={mapboxToken || ""}
         onSubmit={setMapboxToken}
       />
     </MapTokenContext.Provider>
@@ -87,25 +127,39 @@ const TokenDialog = ({ isOpen, onClose, currentToken, onSubmit }: TokenDialogPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Set Mapbox Token</DialogTitle>
+          <DialogDescription>
+            A Mapbox token is required to display maps in this application.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">
-                Enter your Mapbox public token. You can find this in your Mapbox account dashboard.
+              <p className="text-sm">
+                Enter your Mapbox access token. You can get one for free by signing up at Mapbox.
               </p>
               <Input
                 id="token"
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
-                placeholder="Enter Mapbox token"
+                placeholder="pk.eyJ1IjoieW91cnVzZXJuYW1lIiwiYSI6ImNr..."
                 className="w-full"
               />
-              <p className="text-xs text-muted-foreground">
-                Note: Your token will be stored in localStorage. A demo token is provided but may have usage limits.
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <a 
+                  href="https://account.mapbox.com/access-tokens/"
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center text-blue-500 hover:underline"
+                >
+                  Get a free token from Mapbox
+                  <ExternalLink className="h-3 w-3 ml-1" />
+                </a>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Note: Your token will be stored in your browser's localStorage. Use a public (pk) token, never share your secret tokens.
               </p>
             </div>
           </div>

@@ -20,6 +20,10 @@ export const geocodeAddress = async (address: string, token?: string): Promise<[
     const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${mapboxToken}`);
     
     if (!response.ok) {
+      if (response.status === 401) {
+        toast.error("Invalid Mapbox token. Please update your token in settings.");
+        return null;
+      }
       throw new Error(`Geocoding API returned status: ${response.status}`);
     }
     
@@ -60,6 +64,10 @@ export const reverseGeocode = async (coordinates: [number, number], token?: stri
     );
     
     if (!response.ok) {
+      if (response.status === 401) {
+        toast.error("Invalid Mapbox token. Please update your token in settings.");
+        return null;
+      }
       throw new Error(`Reverse geocoding API returned status: ${response.status}`);
     }
     
