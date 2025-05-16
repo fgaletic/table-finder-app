@@ -22,6 +22,25 @@ const Home = () => {
     queryFn: fetchGamingTables,
   });
 
+  // Display error toast if fetching fails
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load gaming tables data. Please try refreshing.");
+      console.error("Error fetching tables:", error);
+    }
+  }, [error]);
+
+  // Log tables data when received
+  useEffect(() => {
+    console.log(`Home component received ${tables?.length || 0} tables from query`);
+    if (tables?.length) {
+      console.log("Sample table with location:", JSON.stringify({
+        id: tables[0].id,
+        location: tables[0].location
+      }));
+    }
+  }, [tables]);
+
   // Process tables to add distance based on user location
   const processedTables = useMemo(() => {
     if (!tables || tables.length === 0) {
@@ -78,12 +97,11 @@ const Home = () => {
   );
 
   useEffect(() => {
-    if (error) {
-      toast.error("Failed to load gaming tables data");
-    }
-    
     console.log("Filtered tables count:", filteredTables.length);
-  }, [error, filteredTables.length]);
+    if (filteredTables.length > 0) {
+      console.log("First filtered table:", filteredTables[0].name);
+    }
+  }, [filteredTables]);
 
   const handleRefresh = () => {
     toast.promise(refetch(), {

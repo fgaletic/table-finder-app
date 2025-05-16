@@ -13,21 +13,40 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
       throw error;
     }
     
-    // Process data into expected format with coordinates
-    const tables = data?.map(table => ({
-      ...table,
-      location: {
-        address: table.location_address || "Barcelona, Spain",
-        coordinates: [table.longitude || 2.1734, table.latitude || 41.3851] as [number, number]
-      },
-      availability: {
-        status: mapAvailabilityStatus(table.availability_status),
-        until: table.availability_until
-      },
-      amenities: table.amenities || []
-    })) || [];
+    console.log("Raw data from Supabase:", data?.length, "tables");
     
-    console.log(`Fetched ${tables.length} tables from Supabase`);
+    // Process data into expected format with coordinates
+    const tables = data?.map(table => {
+      // Ensure we have valid coordinates
+      const longitude = typeof table.longitude === 'number' ? table.longitude : 2.1734;
+      const latitude = typeof table.latitude === 'number' ? table.latitude : 41.3851;
+      
+      return {
+        ...table,
+        location: {
+          address: table.location_address || "Barcelona, Spain",
+          coordinates: [longitude, latitude] as [number, number]
+        },
+        availability: {
+          status: mapAvailabilityStatus(table.availability_status),
+          until: table.availability_until
+        },
+        amenities: table.amenities || []
+      };
+    }) || [];
+    
+    console.log(`Fetched ${tables.length} tables from Supabase with coordinates`);
+    
+    // Log a sample of the first table for debugging
+    if (tables.length > 0) {
+      console.log("First table sample with coordinates:", 
+        JSON.stringify({
+          id: tables[0].id,
+          name: tables[0].name,
+          coordinates: tables[0].location.coordinates
+        })
+      );
+    }
     
     // If no tables returned from Supabase, fall back to mock data
     if (tables.length === 0) {
@@ -63,11 +82,15 @@ export const fetchGamingTableById = async (id: string): Promise<GamingTable | nu
       return null;
     }
     
+    // Ensure we have valid coordinates
+    const longitude = typeof data.longitude === 'number' ? data.longitude : 2.1734;
+    const latitude = typeof data.latitude === 'number' ? data.latitude : 41.3851;
+    
     return {
       ...data,
       location: {
         address: data.location_address || "Barcelona, Spain",
-        coordinates: [data.longitude || 2.1734, data.latitude || 41.3851] as [number, number]
+        coordinates: [longitude, latitude] as [number, number]
       },
       availability: {
         status: mapAvailabilityStatus(data.availability_status),
@@ -86,7 +109,7 @@ export const fetchGamingTableById = async (id: string): Promise<GamingTable | nu
 // Helper function to map availability status to the correct type
 const mapAvailabilityStatus = (status: string): "available" | "occupied" | "maintenance" => {
   if (status === "available" || status === "occupied" || status === "maintenance") {
-    return status;
+    return status as "available" | "occupied" | "maintenance";
   }
   return "available"; // Default fallback
 };
