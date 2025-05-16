@@ -75,6 +75,19 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
         console.log("Map loaded successfully");
         setMapReady(true);
       });
+      
+      // Add Barcelona landmark marker if no tables
+      if (gamingTables.length === 0) {
+        console.log("No tables, adding Barcelona landmark marker");
+        const popup = new mapboxgl.Popup({ offset: 25 })
+          .setHTML('<h3>Barcelona</h3><p>No gaming tables are currently available here. Try adding some!</p>');
+          
+        new mapboxgl.Marker({ color: "#3FB1CE" })
+          .setLngLat(defaultCenter)
+          .setPopup(popup)
+          .addTo(map.current);
+      }
+      
     } catch (error) {
       console.error("Error initializing map:", error);
       onError(`Failed to initialize map: ${(error as Error).message}`);
@@ -87,7 +100,7 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
         map.current = null;
       }
     };
-  }, [mapContainer, mapboxToken, onError]);
+  }, [mapContainer, mapboxToken, onError, gamingTables.length]);
 
   // Fit bounds when tables or selection changes
   useEffect(() => {

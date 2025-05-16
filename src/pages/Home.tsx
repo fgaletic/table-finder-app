@@ -24,7 +24,12 @@ const Home = () => {
 
   // Process tables to add distance based on user location
   const processedTables = useMemo(() => {
-    if (!tables) return [];
+    if (!tables || tables.length === 0) {
+      console.log("No tables data received in Home component");
+      return [];
+    }
+    
+    console.log(`Processing ${tables.length} tables in Home component`);
     
     // Barcelona city center coordinates
     const userLocation: [number, number] = [2.1734, 41.3851]; // Barcelona coordinates
@@ -33,7 +38,7 @@ const Home = () => {
       // Calculate distance
       const distance = calculateDistance(
         userLocation,
-        table.location ? table.location.coordinates : [2.1734, 41.3851]
+        table.location?.coordinates || [2.1734, 41.3851]
       );
       
       return {
@@ -76,7 +81,9 @@ const Home = () => {
     if (error) {
       toast.error("Failed to load gaming tables data");
     }
-  }, [error]);
+    
+    console.log("Filtered tables count:", filteredTables.length);
+  }, [error, filteredTables.length]);
 
   const handleRefresh = () => {
     toast.promise(refetch(), {
