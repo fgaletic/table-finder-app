@@ -34,6 +34,9 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
     if (map.current) return;
     
     try {
+      console.log("Initializing map with token:", mapboxToken.substring(0, 10) + "...");
+      console.log("Tables to display:", gamingTables.length);
+      
       // Initialize map
       mapboxgl.accessToken = mapboxToken;
       
@@ -69,6 +72,7 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
 
       // Mark map as ready when loaded
       map.current.on('load', () => {
+        console.log("Map loaded successfully");
         setMapReady(true);
       });
     } catch (error) {
@@ -87,13 +91,20 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
 
   // Fit bounds when tables or selection changes
   useEffect(() => {
-    if (!map.current || !mapReady || !gamingTables.length) return;
+    if (!map.current || !mapReady) return;
 
+    console.log("Fitting bounds with tables:", gamingTables.length);
+    
     // Fit bounds to include all markers if there are any
     try {
       const tablesWithCoordinates = gamingTables.filter(
         table => table.location && table.location.coordinates
       );
+      
+      console.log("Tables with coordinates:", tablesWithCoordinates.length);
+      console.log("Coordinates sample:", tablesWithCoordinates.length > 0 
+        ? JSON.stringify(tablesWithCoordinates[0].location?.coordinates) 
+        : "None");
       
       if (tablesWithCoordinates.length > 0) {
         const bounds = new mapboxgl.LngLatBounds();
@@ -108,12 +119,18 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
           padding: 100,
           maxZoom: 15
         });
+      } else {
+        // If no tables with coordinates, center on Barcelona
+        map.current.flyTo({
+          center: defaultCenter,
+          zoom: 13,
+          essential: true
+        });
       }
     } catch (error) {
       console.error("Error fitting bounds:", error);
-      onError(`Failed to fit bounds: ${(error as Error).message}`);
     }
-  }, [gamingTables, mapReady, onError]);
+  }, [gamingTables, mapReady]);
 
   // Handle marker click
   const handleMarkerClick = (tableId: string) => {

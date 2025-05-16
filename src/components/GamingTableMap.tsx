@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GamingTable } from "@/services/gamingTableData";
 import { Settings } from "lucide-react";
 import { useMapToken } from "./MapTokenProvider";
@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import MapContainer from "./map/MapContainer";
 import MapTokenRequest from "./map/MapTokenRequest";
 import MapError from "./map/MapError";
+import { toast } from "sonner";
 
 interface GamingTableMapProps {
   gamingTables: (GamingTable & { 
@@ -21,6 +22,32 @@ interface GamingTableMapProps {
 const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps) => {
   const { mapboxToken, showTokenDialog, isTokenValid } = useMapToken();
   const [mapError, setMapError] = useState<string | null>(null);
+  
+  // Log tables data for debugging
+  useEffect(() => {
+    console.log("GamingTableMap received tables:", gamingTables.length);
+    console.log("First table sample:", gamingTables.length > 0 ? 
+      JSON.stringify({
+        id: gamingTables[0].id,
+        name: gamingTables[0].name,
+        location: gamingTables[0].location
+      }) : "No tables");
+    
+    if (!mapboxToken) {
+      console.log("No Mapbox token available. Map won't render.");
+    } else if (!isTokenValid) {
+      console.log("Mapbox token is invalid. Map won't render properly.");
+    }
+    
+    // Check if tables have valid coordinates
+    const tablesWithCoordinates = gamingTables.filter(
+      table => table.location && table.location.coordinates
+    );
+    
+    if (tablesWithCoordinates.length === 0 && gamingTables.length > 0) {
+      toast.error("No tables have valid coordinates to display on the map.");
+    }
+  }, [gamingTables, mapboxToken, isTokenValid]);
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-lg">
