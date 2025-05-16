@@ -38,158 +38,158 @@ export interface GamingTable {
   venueAddress?: string;
 }
 
-// Barcelona mock data - these are real coordinates and addresses in Barcelona
+// Barcelona gaming venues - these are real coordinates and addresses in Barcelona
 const mockGamingVenues: GamingVenue[] = [
   {
     id: "v1",
-    name: "Barcelona Board Game Café",
+    name: "Kaburi Café",
     location: {
-      address: "Carrer de Provença, 181, 08036 Barcelona",
-      coordinates: [2.1547, 41.3873],
+      address: "Carrer dels Escudellers, 54, 08002 Barcelona",
+      coordinates: [2.1766, 41.3796],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
     rating: 4.8,
-    reviewCount: 32,
-    description: "A cozy café with a wide selection of board games and authentic Spanish snacks.",
-    amenities: ["Coffee", "WiFi", "Power Outlets"],
-    distance: 350,
+    reviewCount: 94,
+    description: "Popular board game café in the Gothic Quarter of Barcelona with over 700 games and a café menu.",
+    amenities: ["Coffee & Snacks", "WiFi", "Over 700 Games"],
+    distance: 250,
     tables: [
       {
         id: "v1-t1",
         name: "Window Table",
-        tableNumber: "1",
+        tableNumber: "K1",
         capacity: 4,
         availability: { status: "available" },
-        amenities: ["Coffee", "WiFi", "Power Outlets"],
+        amenities: ["Coffee Service", "Game Library Access", "WiFi"],
         location: {
-          address: "Carrer de Provença, 181, 08036 Barcelona",
-          coordinates: [2.1547, 41.3873],
+          address: "Carrer dels Escudellers, 54, 08002 Barcelona",
+          coordinates: [2.1766, 41.3796],
         },
-        distance: 350,
+        distance: 250,
         rating: 4.8
       },
       {
         id: "v1-t2",
         name: "Private Room",
-        tableNumber: "2",
+        tableNumber: "K2",
         capacity: 8,
-        availability: { status: "available" },
-        amenities: ["Coffee", "WiFi", "Power Outlets"],
+        availability: { status: "occupied", until: "18:30" },
+        amenities: ["Private Space", "Game Library Access", "WiFi"],
         location: {
-          address: "Carrer de Provença, 181, 08036 Barcelona",
-          coordinates: [2.1547, 41.3873],
+          address: "Carrer dels Escudellers, 54, 08002 Barcelona",
+          coordinates: [2.1766, 41.3796],
         },
-        distance: 350,
+        distance: 250,
         rating: 4.8
       }
     ]
   },
   {
     id: "v2",
-    name: "Plaça Catalunya Gaming Zone",
+    name: "Sandoichi Board Game Bar",
     location: {
-      address: "Plaça de Catalunya, 08002 Barcelona",
-      coordinates: [2.1700, 41.3874],
+      address: "Carrer del Rec, 10, 08003 Barcelona",
+      coordinates: [2.1829, 41.3845],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
-    rating: 4.2,
-    reviewCount: 47,
-    description: "A community gaming zone near the famous Plaça de Catalunya. Perfect for tourists and locals alike.",
-    amenities: ["Game Rentals", "Snack Bar", "Tournaments"],
-    distance: 620,
+    rating: 4.6,
+    reviewCount: 75,
+    description: "Japanese-inspired board game bar with snacks, drinks, and a large collection of games near El Born.",
+    amenities: ["Japanese Snacks", "Cocktails", "Game Library"],
+    distance: 520,
     tables: [
       {
         id: "v2-t1",
-        name: "Center Table",
-        tableNumber: "3",
+        name: "Tatami Table",
+        tableNumber: "S1",
         capacity: 6,
-        availability: { status: "occupied", until: "15:30" },
-        amenities: ["Game Rentals", "Snack Bar", "Tournaments"],
+        availability: { status: "available" },
+        amenities: ["Japanese-style Seating", "Food Service", "Drink Menu"],
         location: {
-          address: "Plaça de Catalunya, 08002 Barcelona",
-          coordinates: [2.1700, 41.3874],
+          address: "Carrer del Rec, 10, 08003 Barcelona",
+          coordinates: [2.1829, 41.3845],
         },
-        distance: 620,
-        rating: 4.2
+        distance: 520,
+        rating: 4.6
       },
       {
         id: "v2-t2",
-        name: "Corner Booth",
-        tableNumber: "4",
+        name: "Bar Area",
+        tableNumber: "S2",
         capacity: 4,
         availability: { status: "available" },
-        amenities: ["Game Rentals", "Snack Bar", "Tournaments"],
+        amenities: ["Bar Seating", "Full Menu", "Game Library Access"],
         location: {
-          address: "Plaça de Catalunya, 08002 Barcelona",
-          coordinates: [2.1700, 41.3874],
+          address: "Carrer del Rec, 10, 08003 Barcelona",
+          coordinates: [2.1829, 41.3845],
         },
-        distance: 620,
-        rating: 4.2
+        distance: 520,
+        rating: 4.6
       }
     ]
   },
   {
     id: "v3",
-    name: "Barceloneta Beach Gaming",
+    name: "Juego Barcelona",
     location: {
-      address: "Passeig Marítim de la Barceloneta, 08003 Barcelona",
-      coordinates: [2.1900, 41.3780],
+      address: "Carrer d'Astúries, 84, 08024 Barcelona",
+      coordinates: [2.1542, 41.4046],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
-    rating: 4.5,
-    reviewCount: 24,
-    description: "Play board games with a view of the Mediterranean Sea. A unique gaming experience near the beach.",
-    amenities: ["Sea View", "Beach Access", "Events"],
-    distance: 850,
+    rating: 4.7,
+    reviewCount: 120,
+    description: "Modern board game café in Gràcia with premium coffee, tapas, and a curated selection of tabletop games.",
+    amenities: ["Tapas", "Local Craft Beer", "Premium Coffee"],
+    distance: 1250,
     tables: [
       {
         id: "v3-t1",
-        name: "Beach View Terrace",
-        tableNumber: "5",
-        capacity: 12,
-        availability: { status: "maintenance", until: "Tomorrow" },
-        amenities: ["Sea View", "Beach Access", "Events"],
+        name: "Outdoor Terrace",
+        tableNumber: "J1",
+        capacity: 6,
+        availability: { status: "available" },
+        amenities: ["Outdoor Seating", "Full Menu", "Heaters in Winter"],
         location: {
-          address: "Passeig Marítim de la Barceloneta, 08003 Barcelona",
-          coordinates: [2.1900, 41.3780],
+          address: "Carrer d'Astúries, 84, 08024 Barcelona",
+          coordinates: [2.1542, 41.4046],
         },
-        distance: 850,
-        rating: 4.5
+        distance: 1250,
+        rating: 4.7
       },
       {
         id: "v3-t2",
-        name: "Indoor Lounge",
-        tableNumber: "6",
-        capacity: 4,
-        availability: { status: "available" },
-        amenities: ["Sea View", "Beach Access", "Events"],
+        name: "Lounge Area",
+        tableNumber: "J2",
+        capacity: 8,
+        availability: { status: "maintenance", until: "Tomorrow" },
+        amenities: ["Comfortable Seating", "Coffee Service", "Game Library"],
         location: {
-          address: "Passeig Marítim de la Barceloneta, 08003 Barcelona",
-          coordinates: [2.1900, 41.3780],
+          address: "Carrer d'Astúries, 84, 08024 Barcelona",
+          coordinates: [2.1542, 41.4046],
         },
-        distance: 850,
-        rating: 4.5
+        distance: 1250,
+        rating: 4.7
       }
     ]
   }
 ];
 
-// Standalone Barcelona tables not associated with venues
+// Barcelona standalone gaming tables not associated with venues
 const standaloneGamingTables: GamingTable[] = [
   {
     id: "st1",
-    name: "La Rambla Community Table",
-    description: "A spacious table near the famous La Rambla street. Enjoy board games while watching the vibrant Barcelona life.",
+    name: "Plaça Reial Community Table",
+    description: "Public table in the beautiful Plaza Real, perfect for casual gaming while enjoying the atmosphere of one of Barcelona's most famous squares.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: { status: "available" },
-    tableNumber: "L1",
+    tableNumber: "PR1",
     capacity: 4,
-    amenities: ["Central Location", "Outdoor", "People Watching"],
+    amenities: ["Public Space", "Nearby Cafés", "Fountain View"],
     location: {
-      address: "La Rambla, 08002 Barcelona",
-      coordinates: [2.1734, 41.3800],
+      address: "Plaça Reial, 08002 Barcelona",
+      coordinates: [2.1761, 41.3797],
     },
-    distance: 500,
+    distance: 270,
     rating: 4.5
   },
   {
@@ -198,115 +198,116 @@ const standaloneGamingTables: GamingTable[] = [
     description: "Play with a view of Gaudí's masterpiece. A premium gaming experience near Barcelona's most iconic landmark.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: { status: "available" },
-    tableNumber: "H1",
+    tableNumber: "SF1",
     capacity: 6,
     amenities: ["Landmark View", "Tourist Area", "Photo Opportunities"],
     location: {
       address: "Carrer de Mallorca, 401, 08013 Barcelona",
       coordinates: [2.1744, 41.4036],
     },
-    distance: 800,
+    distance: 1800,
     rating: 4.7
   },
   {
     id: "st3",
-    name: "Gothic Quarter Hidden Gem",
-    description: "A charming table tucked away in Barcelona's historic Gothic Quarter. Experience the magic of old Barcelona.",
+    name: "Parc de la Ciutadella Gaming Table",
+    description: "Enjoy board games in Barcelona's most central park, near the lake and the famous fountain.",
     images: ["/placeholder.svg", "/placeholder.svg"],
-    availability: { status: "available" },
-    tableNumber: "G1",
+    availability: { status: "occupied", until: "17:00" },
+    tableNumber: "PC1",
     capacity: 4,
-    amenities: ["Historic Setting", "Quiet", "Authentic Experience"],
+    amenities: ["Park Setting", "Nearby Lake", "Natural Shade"],
     location: {
-      address: "Carrer del Bisbe, 08002 Barcelona",
-      coordinates: [2.1764, 41.3843],
+      address: "Passeig de Picasso, 21, 08003 Barcelona",
+      coordinates: [2.1871, 41.3875],
     },
-    distance: 450,
-    rating: 4.9
+    distance: 750,
+    rating: 4.3
   },
   {
     id: "st4",
-    name: "Montjuïc Castle Gaming Table",
-    description: "Board gaming with panoramic views of Barcelona and the Mediterranean from Montjuïc Hill.",
+    name: "Barceloneta Beach Gaming",
+    description: "Play board games with a view of the Mediterranean Sea. A unique gaming experience near the beach.",
     images: ["/placeholder.svg", "/placeholder.svg"],
-    availability: { status: "occupied", until: "16:00" },
-    tableNumber: "M1",
-    capacity: 8,
-    amenities: ["Panoramic View", "Castle Setting", "Outdoor"],
+    availability: { status: "available" },
+    tableNumber: "BB1",
+    capacity: 6,
+    amenities: ["Sea View", "Beach Access", "Outdoor Experience"],
     location: {
-      address: "Ctra. de Montjuïc, 66, 08038 Barcelona",
-      coordinates: [2.1663, 41.3644],
+      address: "Passeig Marítim de la Barceloneta, 08003 Barcelona",
+      coordinates: [2.1900, 41.3780],
     },
-    distance: 1200,
-    rating: 4.6
+    distance: 850,
+    rating: 4.4
   }
 ];
 
-// Updated mock tables for Barcelona
+// Updated mock tables for Barcelona - this combines venues and standalone tables
 const mockGamingTables: GamingTable[] = [
   {
     id: "1",
-    name: "Barcelona Board Game Café",
-    description: "A cozy café with a wide selection of board games and authentic Spanish snacks.",
+    name: "Kaburi Café",
+    description: "Popular board game café in the Gothic Quarter of Barcelona with over 700 games and a café menu.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
       status: "available",
     },
-    tableNumber: "Table 1",
-    distance: 350,
+    tableNumber: "Table K1",
+    distance: 250,
     rating: 4.8,
     location: {
-      address: "Carrer de Provença, 181, 08036 Barcelona",
-      coordinates: [2.1547, 41.3873],
+      address: "Carrer dels Escudellers, 54, 08002 Barcelona",
+      coordinates: [2.1766, 41.3796],
     },
   },
   {
     id: "2",
-    name: "La Rambla Community Table",
-    description: "A spacious table near the famous La Rambla street. Enjoy board games while watching the vibrant Barcelona life.",
+    name: "Plaça Reial Community Table",
+    description: "Public table in the beautiful Plaza Real, perfect for casual gaming while enjoying the atmosphere of one of Barcelona's most famous squares.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
       status: "available",
     },
-    tableNumber: "Table 2",
-    distance: 500,
+    tableNumber: "Table PR1",
+    distance: 270,
     rating: 4.5,
     location: {
-      address: "La Rambla, 08002 Barcelona",
-      coordinates: [2.1734, 41.3800],
+      address: "Plaça Reial, 08002 Barcelona",
+      coordinates: [2.1761, 41.3797],
     },
   },
   {
     id: "3",
-    name: "Plaça Catalunya Gaming Zone",
-    description: "A community gaming zone near the famous Plaça de Catalunya. Perfect for tourists and locals alike.",
+    name: "Sandoichi Board Game Bar",
+    description: "Japanese-inspired board game bar with snacks, drinks, and a large collection of games near El Born.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
       status: "occupied",
-      until: "15:30",
+      until: "18:30",
     },
-    tableNumber: "Table 3",
-    distance: 620,
-    rating: 4.2,
+    tableNumber: "Table S1",
+    distance: 520,
+    rating: 4.6,
     location: {
-      address: "Plaça de Catalunya, 08002 Barcelona",
-      coordinates: [2.1700, 41.3874],
+      address: "Carrer del Rec, 10, 08003 Barcelona",
+      coordinates: [2.1829, 41.3845],
     },
   },
   {
     id: "4",
-    name: "Sagrada Família Game Space",
-    description: "Play with a view of Gaudí's masterpiece. A premium gaming experience near Barcelona's most iconic landmark.",
+    name: "Parc de la Ciutadella Gaming Table",
+    description: "Enjoy board games in Barcelona's most central park, near the lake and the famous fountain.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
-      status: "available",
+      status: "occupied",
+      until: "17:00",
     },
-    tableNumber: "Table 4",
-    distance: 800,
-    rating: 4.7,
+    tableNumber: "Table PC1",
+    distance: 750,
+    rating: 4.3,
     location: {
-      address: "Carrer de Mallorca, 401, 08013 Barcelona",
-      coordinates: [2.1744, 41.4036],
+      address: "Passeig de Picasso, 21, 08003 Barcelona",
+      coordinates: [2.1871, 41.3875],
     },
   },
   {
@@ -315,15 +316,47 @@ const mockGamingTables: GamingTable[] = [
     description: "Play board games with a view of the Mediterranean Sea. A unique gaming experience near the beach.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
-      status: "maintenance",
-      until: "Tomorrow",
+      status: "available",
     },
-    tableNumber: "Table 5",
+    tableNumber: "Table BB1",
     distance: 850,
-    rating: 4.3,
+    rating: 4.4,
     location: {
       address: "Passeig Marítim de la Barceloneta, 08003 Barcelona",
       coordinates: [2.1900, 41.3780],
+    },
+  },
+  {
+    id: "6",
+    name: "Sagrada Família Game Space",
+    description: "Play with a view of Gaudí's masterpiece. A premium gaming experience near Barcelona's most iconic landmark.",
+    images: ["/placeholder.svg", "/placeholder.svg"],
+    availability: {
+      status: "available",
+    },
+    tableNumber: "Table SF1",
+    distance: 1800,
+    rating: 4.7,
+    location: {
+      address: "Carrer de Mallorca, 401, 08013 Barcelona",
+      coordinates: [2.1744, 41.4036],
+    },
+  },
+  {
+    id: "7",
+    name: "Juego Barcelona",
+    description: "Modern board game café in Gràcia with premium coffee, tapas, and a curated selection of tabletop games.",
+    images: ["/placeholder.svg", "/placeholder.svg"],
+    availability: {
+      status: "maintenance",
+      until: "Tomorrow",
+    },
+    tableNumber: "Table J1",
+    distance: 1250,
+    rating: 4.7,
+    location: {
+      address: "Carrer d'Astúries, 84, 08024 Barcelona",
+      coordinates: [2.1542, 41.4046],
     },
   },
 ];
