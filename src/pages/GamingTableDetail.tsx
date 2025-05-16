@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchGamingTableWithHost, createBooking, sendMessage } from "@/services/supabaseService";
 import { Button } from "@/components/ui/button";
