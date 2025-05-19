@@ -2,223 +2,150 @@
 import { supabase } from "@/integrations/supabase/client";
 import { GamingTable } from "./gamingTableData";
 
-export const fetchGamingTables = async (): Promise<GamingTable[]> => {
-  try {
-    console.log("Fetching gaming tables from Supabase...");
-    const { data, error } = await supabase
-      .from("gaming_tables")
-      .select("*");
-    
-    if (error) {
-      console.error("Error fetching gaming tables:", error);
-      throw error;
-    }
-    
-    console.log("Raw data from Supabase:", data);
-    console.log("Number of tables returned:", data?.length ?? 0);
-    
-    // If no data returned from Supabase, don't fall back to mock data
-    if (!data || data.length === 0) {
-      console.log("No tables from Supabase");
-      return [];
-    }
-    
-    // Process data into expected format with coordinates
-    const tables = data.map(table => {
-      console.log("Processing table:", table.id, table.name);
-      
-      // Ensure we have valid coordinates
-      const longitude = typeof table.longitude === 'number' ? table.longitude : 2.1734;
-      const latitude = typeof table.latitude === 'number' ? table.latitude : 41.3851;
-      
-      console.log(`Table ${table.id} coordinates:`, longitude, latitude);
-      
-      // Convert availability status to the correct type
-      const status = mapAvailabilityStatus(table.availability_status);
-      
-      return {
-        id: table.id,
-        name: table.name,
-        description: table.description || "No description available",
-        images: table.images || ["/placeholder.svg"],
-        location: {
-          address: table.location_address || "Barcelona, Spain",
-          coordinates: [longitude, latitude] as [number, number]
-        },
-        availability: {
-          status: status,
-          until: table.availability_until
-        },
-        capacity: table.capacity || 4,
-        amenities: table.amenities || ["WiFi"],
-        rating: table.rating || 4.0,
-        reviewCount: table.review_count || 10,
-        host_id: table.host_id
-      };
-    });
-    
-    console.log(`Processed ${tables.length} tables from Supabase with coordinates`);
-    
-    // Log all tables for debugging
-    tables.forEach((table, index) => {
-      console.log(`Table ${index + 1}:`, {
-        id: table.id,
-        name: table.name,
-        coordinates: table.location.coordinates,
-        rating: table.rating,
-        status: table.availability.status
-      });
-    });
-    
-    return tables;
-  } catch (error) {
-    console.error("Error in fetchGamingTables service:", error);
-    // Return an empty array instead of falling back to mock data
-    console.log("Error fetching from Supabase, returning empty array");
-    return [];
-  }
-};
+export interface Host {
+  id: string;
+  name: string;
+  email: string;
+  bio?: string;
+  phone?: string;
+  avatar_url?: string;
+  is_business?: boolean; // Flag to indicate if the host is a business or private individual
+}
 
-// Helper function to map availability status to the correct type
-const mapAvailabilityStatus = (status: string): "available" | "occupied" | "maintenance" => {
-  if (status === "available" || status === "occupied" || status === "maintenance") {
-    return status as "available" | "occupied" | "maintenance";
-  }
-  return "available"; // Default fallback
-};
-
-export const fetchGamingTableById = async (id: string): Promise<GamingTable | null> => {
-  try {
-    const { data, error } = await supabase
-      .from("gaming_tables")
-      .select("*")
-      .eq("id", id)
-      .single();
-    
-    if (error) {
-      console.error("Error fetching gaming table:", error);
-      throw error;
-    }
-    
-    if (!data) {
-      return null;
-    }
-    
-    // Ensure we have valid coordinates
-    const longitude = typeof data.longitude === 'number' ? data.longitude : 2.1734;
-    const latitude = typeof data.latitude === 'number' ? data.latitude : 41.3851;
-    
-    return {
-      id: data.id,
-      name: data.name,
-      description: data.description,
-      images: data.images || ["/placeholder.svg"],
-      location: {
-        address: data.location_address || "Barcelona, Spain",
-        coordinates: [longitude, latitude] as [number, number]
-      },
-      availability: {
-        status: mapAvailabilityStatus(data.availability_status),
-        until: data.availability_until
-      },
-      capacity: data.capacity || 4,
-      amenities: data.amenities || ["WiFi"],
-      rating: data.rating || 4.0,
-      reviewCount: data.review_count || 10,
-      host_id: data.host_id
-    };
-  } catch (error) {
-    console.error("Error in fetchGamingTableById service:", error);
-    return null;
-  }
-};
-
-// New function to fetch a table with its host information
-export const fetchGamingTableWithHost = async (id: string) => {
-  try {
-    // Fetch the table
-    const table = await fetchGamingTableById(id);
-    
-    if (!table) {
-      console.error("Table not found");
-      return { table: null, host: null };
-    }
-    
-    // If the table has a host_id, fetch the host information
-    if (table.host_id) {
-      const { data: host, error } = await supabase
-        .from("hosts")
-        .select("*")
-        .eq("id", table.host_id)
-        .single();
-      
-      if (error) {
-        console.error("Error fetching host:", error);
-        return { table, host: null };
-      }
-      
-      return { table, host };
-    }
-    
-    return { table, host: null };
-  } catch (error) {
-    console.error("Error fetching table with host:", error);
-    return { table: null, host: null };
-  }
-};
-
-export const createBooking = async (bookingData: {
+export interface Booking {
+  id: string;
   table_id: string;
   user_name: string;
   user_email: string;
   start_time: string;
   end_time: string;
-  status: string;
-}) => {
-  try {
-    const { data, error } = await supabase
-      .from("bookings")
-      .insert([bookingData])
-      .select();
-    
-    if (error) {
-      console.error("Error creating booking:", error);
-      throw error;
-    }
-    
-    console.log("Booking created successfully:", data);
-    return data;
-  } catch (error) {
-    console.error("Error in createBooking service:", error);
-    throw error;
-  }
-};
+  status: "pending" | "confirmed" | "cancelled";
+  created_at: string;
+}
 
-export const sendMessage = async (messageData: {
-  host_id: string;
-  table_id: string;
+export interface Message {
+  id?: string;
   sender_name: string;
   sender_email: string;
+  host_id: string;
+  table_id: string;
   message: string;
-}) => {
-  try {
-    const { data, error } = await supabase
-      .from("messages")
-      .insert([{
-        ...messageData,
-        read: false
-      }])
-      .select();
-    
-    if (error) {
-      console.error("Error sending message:", error);
-      throw error;
-    }
-    
-    console.log("Message sent successfully:", data);
-    return data;
-  } catch (error) {
-    console.error("Error in sendMessage service:", error);
+  created_at?: string;
+}
+
+// Fetch all gaming tables from Supabase
+export const fetchGamingTables = async () => {
+  const { data, error } = await supabase
+    .from("gaming_tables")
+    .select("*");
+  
+  if (error) {
+    console.error("Error fetching gaming tables:", error);
     throw error;
   }
+  
+  // Transform to match our existing GamingTable interface with proper type casting
+  return data.map(table => ({
+    id: table.id,
+    name: table.name,
+    description: table.description || "",
+    location: {
+      address: table.location_address,
+      coordinates: [table.longitude, table.latitude] as [number, number],
+    },
+    images: table.images || ["/placeholder.svg"],
+    availability: {
+      status: (table.availability_status || "available") as "available" | "occupied" | "maintenance",
+      until: table.availability_until,
+    },
+    capacity: table.capacity,
+    amenities: table.amenities || [],
+    rating: table.rating,
+    reviewCount: table.review_count,
+    distance: 0, // Will be calculated based on user location
+    host_id: table.host_id,
+    // We intentionally don't add fields like "venueId" or "venueName" here
+    // to avoid biasing towards venues. Instead, host information can indicate
+    // if this is a private table or part of a commercial venue
+  }));
+};
+
+// Fetch a single gaming table with its host information
+export const fetchGamingTableWithHost = async (id: string) => {
+  // First fetch the gaming table
+  const { data: tableData, error: tableError } = await supabase
+    .from("gaming_tables")
+    .select("*")
+    .eq("id", id)
+    .single();
+  
+  if (tableError) {
+    console.error("Error fetching gaming table:", tableError);
+    throw tableError;
+  }
+  
+  // Then fetch the host information
+  const { data: hostData, error: hostError } = await supabase
+    .from("hosts")
+    .select("*")
+    .eq("id", tableData.host_id)
+    .single();
+  
+  if (hostError) {
+    console.error("Error fetching host information:", hostError);
+  }
+  
+  // Transform to match our existing GamingTable interface and add host
+  return {
+    table: {
+      id: tableData.id,
+      name: tableData.name,
+      description: tableData.description || "",
+      location: {
+        address: tableData.location_address,
+        coordinates: [tableData.longitude, tableData.latitude] as [number, number],
+      },
+      images: tableData.images || ["/placeholder.svg"],
+      availability: {
+        status: (tableData.availability_status || "available") as "available" | "occupied" | "maintenance",
+        until: tableData.availability_until,
+      },
+      capacity: tableData.capacity,
+      amenities: tableData.amenities || [],
+      rating: tableData.rating,
+      reviewCount: tableData.review_count,
+      host_id: tableData.host_id,
+    },
+    host: hostData || null,
+  };
+};
+
+// Book a gaming table
+export const createBooking = async (booking: Omit<Booking, "id" | "created_at">) => {
+  const { data, error } = await supabase
+    .from("bookings")
+    .insert([booking])
+    .select();
+  
+  if (error) {
+    console.error("Error creating booking:", error);
+    throw error;
+  }
+  
+  return data[0];
+};
+
+// Send a message to a host
+export const sendMessage = async (message: Message) => {
+  const { data, error } = await supabase
+    .from("messages")
+    .insert([message])
+    .select();
+  
+  if (error) {
+    console.error("Error sending message:", error);
+    throw error;
+  }
+  
+  return data[0];
 };

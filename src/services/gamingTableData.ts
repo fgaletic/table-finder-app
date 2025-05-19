@@ -1,4 +1,3 @@
-
 export interface GamingVenue {
   id: string;
   name: string;
@@ -38,326 +37,239 @@ export interface GamingTable {
   venueAddress?: string;
 }
 
-// Barcelona gaming venues - these are real coordinates and addresses in Barcelona
 const mockGamingVenues: GamingVenue[] = [
   {
     id: "v1",
-    name: "Kaburi Café",
+    name: "Downtown Board Game Café",
     location: {
-      address: "Carrer dels Escudellers, 54, 08002 Barcelona",
-      coordinates: [2.1766, 41.3796],
+      address: "123 Main St, Downtown",
+      coordinates: [-74.006, 40.7128],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
     rating: 4.8,
-    reviewCount: 94,
-    description: "Popular board game café in the Gothic Quarter of Barcelona with over 700 games and a café menu.",
-    amenities: ["Coffee & Snacks", "WiFi", "Over 700 Games"],
-    distance: 250,
+    reviewCount: 32,
+    description: "A cozy café with a wide selection of board games and snacks.",
+    amenities: ["Snacks", "WiFi", "Power Outlets"],
+    distance: 350,
     tables: [
       {
         id: "v1-t1",
         name: "Window Table",
-        tableNumber: "K1",
+        tableNumber: "1",
         capacity: 4,
         availability: { status: "available" },
-        amenities: ["Coffee Service", "Game Library Access", "WiFi"],
+        amenities: ["Snacks", "WiFi", "Power Outlets"],
         location: {
-          address: "Carrer dels Escudellers, 54, 08002 Barcelona",
-          coordinates: [2.1766, 41.3796],
+          address: "123 Main St, Downtown",
+          coordinates: [-74.006, 40.7128],
         },
-        distance: 250,
+        distance: 350,
         rating: 4.8
       },
       {
         id: "v1-t2",
         name: "Private Room",
-        tableNumber: "K2",
+        tableNumber: "2",
         capacity: 8,
-        availability: { status: "occupied", until: "18:30" },
-        amenities: ["Private Space", "Game Library Access", "WiFi"],
+        availability: { status: "available" },
+        amenities: ["Snacks", "WiFi", "Power Outlets"],
         location: {
-          address: "Carrer dels Escudellers, 54, 08002 Barcelona",
-          coordinates: [2.1766, 41.3796],
+          address: "123 Main St, Downtown",
+          coordinates: [-74.006, 40.7128],
         },
-        distance: 250,
+        distance: 350,
         rating: 4.8
       }
     ]
   },
   {
     id: "v2",
-    name: "Sandoichi Board Game Bar",
+    name: "Mall Gaming Zone",
     location: {
-      address: "Carrer del Rec, 10, 08003 Barcelona",
-      coordinates: [2.1829, 41.3845],
+      address: "456 Shopping Mall, Upper Level",
+      coordinates: [-73.986, 40.7328],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
-    rating: 4.6,
-    reviewCount: 75,
-    description: "Japanese-inspired board game bar with snacks, drinks, and a large collection of games near El Born.",
-    amenities: ["Japanese Snacks", "Cocktails", "Game Library"],
-    distance: 520,
+    rating: 4.2,
+    reviewCount: 47,
+    description: "A gaming zone in the mall's upper level with a variety of board games. Great for quick gaming sessions.",
+    amenities: ["Game Rentals", "Snack Bar", "Tournaments"],
+    distance: 620,
     tables: [
       {
         id: "v2-t1",
-        name: "Tatami Table",
-        tableNumber: "S1",
+        name: "Center Table",
+        tableNumber: "3",
         capacity: 6,
-        availability: { status: "available" },
-        amenities: ["Japanese-style Seating", "Food Service", "Drink Menu"],
+        availability: { status: "occupied", until: "3:30 PM" },
+        amenities: ["Game Rentals", "Snack Bar", "Tournaments"],
         location: {
-          address: "Carrer del Rec, 10, 08003 Barcelona",
-          coordinates: [2.1829, 41.3845],
+          address: "456 Shopping Mall, Upper Level",
+          coordinates: [-73.986, 40.7328],
         },
-        distance: 520,
-        rating: 4.6
+        distance: 620,
+        rating: 4.2
       },
       {
         id: "v2-t2",
-        name: "Bar Area",
-        tableNumber: "S2",
+        name: "Corner Booth",
+        tableNumber: "4",
         capacity: 4,
         availability: { status: "available" },
-        amenities: ["Bar Seating", "Full Menu", "Game Library Access"],
+        amenities: ["Game Rentals", "Snack Bar", "Tournaments"],
         location: {
-          address: "Carrer del Rec, 10, 08003 Barcelona",
-          coordinates: [2.1829, 41.3845],
+          address: "456 Shopping Mall, Upper Level",
+          coordinates: [-73.986, 40.7328],
         },
-        distance: 520,
-        rating: 4.6
+        distance: 620,
+        rating: 4.2
       }
     ]
   },
   {
     id: "v3",
-    name: "Juego Barcelona",
+    name: "Student Center Gaming Lounge",
     location: {
-      address: "Carrer d'Astúries, 84, 08024 Barcelona",
-      coordinates: [2.1542, 41.4046],
+      address: "789 University Ave",
+      coordinates: [-74.106, 40.7528],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
-    rating: 4.7,
-    reviewCount: 120,
-    description: "Modern board game café in Gràcia with premium coffee, tapas, and a curated selection of tabletop games.",
-    amenities: ["Tapas", "Local Craft Beer", "Premium Coffee"],
-    distance: 1250,
+    rating: 4.5,
+    reviewCount: 24,
+    description: "A vibrant gaming lounge in the university's student center. Ideal for group board game sessions.",
+    amenities: ["Free Game Library", "Student Discounts", "Events"],
+    distance: 850,
     tables: [
       {
         id: "v3-t1",
-        name: "Outdoor Terrace",
-        tableNumber: "J1",
-        capacity: 6,
-        availability: { status: "available" },
-        amenities: ["Outdoor Seating", "Full Menu", "Heaters in Winter"],
+        name: "Main Gaming Area",
+        tableNumber: "5",
+        capacity: 12,
+        availability: { status: "maintenance", until: "Tomorrow" },
+        amenities: ["Free Game Library", "Student Discounts", "Events"],
         location: {
-          address: "Carrer d'Astúries, 84, 08024 Barcelona",
-          coordinates: [2.1542, 41.4046],
+          address: "789 University Ave",
+          coordinates: [-74.106, 40.7528],
         },
-        distance: 1250,
-        rating: 4.7
+        distance: 850,
+        rating: 4.5
       },
       {
         id: "v3-t2",
-        name: "Lounge Area",
-        tableNumber: "J2",
-        capacity: 8,
-        availability: { status: "maintenance", until: "Tomorrow" },
-        amenities: ["Comfortable Seating", "Coffee Service", "Game Library"],
+        name: "Quiet Study Corner",
+        tableNumber: "6",
+        capacity: 4,
+        availability: { status: "available" },
+        amenities: ["Free Game Library", "Student Discounts", "Events"],
         location: {
-          address: "Carrer d'Astúries, 84, 08024 Barcelona",
-          coordinates: [2.1542, 41.4046],
+          address: "789 University Ave",
+          coordinates: [-74.106, 40.7528],
         },
-        distance: 1250,
-        rating: 4.7
+        distance: 850,
+        rating: 4.5
       }
     ]
   }
 ];
 
-// Barcelona standalone gaming tables not associated with venues
+// Standalone tables not associated with venues
 const standaloneGamingTables: GamingTable[] = [
   {
     id: "st1",
-    name: "Plaça Reial Community Table",
-    description: "Public table in the beautiful Plaza Real, perfect for casual gaming while enjoying the atmosphere of one of Barcelona's most famous squares.",
+    name: "Library Lounge Table",
+    description: "A spacious table in the public library's lounge, perfect for board games. Quiet environment with excellent lighting.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: { status: "available" },
-    tableNumber: "PR1",
+    tableNumber: "L1",
     capacity: 4,
-    amenities: ["Public Space", "Nearby Cafés", "Fountain View"],
+    amenities: ["Quiet", "Good Lighting"],
     location: {
-      address: "Plaça Reial, 08002 Barcelona",
-      coordinates: [2.1761, 41.3797],
+      address: "123 Library St",
+      coordinates: [-74.005, 40.7135],
     },
-    distance: 270,
+    distance: 500,
     rating: 4.5
   },
   {
     id: "st2",
-    name: "Sagrada Família Game Space",
-    description: "Play with a view of Gaudí's masterpiece. A premium gaming experience near Barcelona's most iconic landmark.",
+    name: "Hotel Lobby Gaming Table",
+    description: "A luxurious gaming table in a boutique hotel's lobby. Perfect for a premium gaming experience.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: { status: "available" },
-    tableNumber: "SF1",
+    tableNumber: "H1",
     capacity: 6,
-    amenities: ["Landmark View", "Tourist Area", "Photo Opportunities"],
+    amenities: ["Premium", "Lobby Service"],
     location: {
-      address: "Carrer de Mallorca, 401, 08013 Barcelona",
-      coordinates: [2.1744, 41.4036],
+      address: "789 Hotel Ave",
+      coordinates: [-74.002, 40.7100],
     },
-    distance: 1800,
+    distance: 800,
     rating: 4.7
-  },
-  {
-    id: "st3",
-    name: "Parc de la Ciutadella Gaming Table",
-    description: "Enjoy board games in Barcelona's most central park, near the lake and the famous fountain.",
-    images: ["/placeholder.svg", "/placeholder.svg"],
-    availability: { status: "occupied", until: "17:00" },
-    tableNumber: "PC1",
-    capacity: 4,
-    amenities: ["Park Setting", "Nearby Lake", "Natural Shade"],
-    location: {
-      address: "Passeig de Picasso, 21, 08003 Barcelona",
-      coordinates: [2.1871, 41.3875],
-    },
-    distance: 750,
-    rating: 4.3
-  },
-  {
-    id: "st4",
-    name: "Barceloneta Beach Gaming",
-    description: "Play board games with a view of the Mediterranean Sea. A unique gaming experience near the beach.",
-    images: ["/placeholder.svg", "/placeholder.svg"],
-    availability: { status: "available" },
-    tableNumber: "BB1",
-    capacity: 6,
-    amenities: ["Sea View", "Beach Access", "Outdoor Experience"],
-    location: {
-      address: "Passeig Marítim de la Barceloneta, 08003 Barcelona",
-      coordinates: [2.1900, 41.3780],
-    },
-    distance: 850,
-    rating: 4.4
   }
 ];
 
-// Updated mock tables for Barcelona - this combines venues and standalone tables
 const mockGamingTables: GamingTable[] = [
   {
     id: "1",
-    name: "Kaburi Café",
-    description: "Popular board game café in the Gothic Quarter of Barcelona with over 700 games and a café menu.",
+    name: "Downtown Board Game Café",
+    description: "A cozy café with a wide selection of board games and snacks.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
       status: "available",
     },
-    tableNumber: "Table K1",
-    distance: 250,
+    tableNumber: "Table 1",
+    distance: 350,
     rating: 4.8,
-    location: {
-      address: "Carrer dels Escudellers, 54, 08002 Barcelona",
-      coordinates: [2.1766, 41.3796],
-    },
   },
   {
     id: "2",
-    name: "Plaça Reial Community Table",
-    description: "Public table in the beautiful Plaza Real, perfect for casual gaming while enjoying the atmosphere of one of Barcelona's most famous squares.",
+    name: "Library Lounge Table",
+    description: "A spacious table in the public library's lounge, perfect for board games. Quiet environment with excellent lighting.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
       status: "available",
     },
-    tableNumber: "Table PR1",
-    distance: 270,
+    tableNumber: "Table 2",
+    distance: 500,
     rating: 4.5,
-    location: {
-      address: "Plaça Reial, 08002 Barcelona",
-      coordinates: [2.1761, 41.3797],
-    },
   },
   {
     id: "3",
-    name: "Sandoichi Board Game Bar",
-    description: "Japanese-inspired board game bar with snacks, drinks, and a large collection of games near El Born.",
+    name: "Mall Gaming Zone",
+    description: "A gaming zone in the mall's upper level with a variety of board games. Great for quick gaming sessions.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
       status: "occupied",
-      until: "18:30",
+      until: "3:30 PM",
     },
-    tableNumber: "Table S1",
-    distance: 520,
-    rating: 4.6,
-    location: {
-      address: "Carrer del Rec, 10, 08003 Barcelona",
-      coordinates: [2.1829, 41.3845],
-    },
+    tableNumber: "Table 3",
+    distance: 1200,
+    rating: 4.2,
   },
   {
     id: "4",
-    name: "Parc de la Ciutadella Gaming Table",
-    description: "Enjoy board games in Barcelona's most central park, near the lake and the famous fountain.",
+    name: "Hotel Lobby Gaming Table",
+    description: "A luxurious gaming table in a boutique hotel's lobby. Perfect for a premium gaming experience.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
-      status: "occupied",
-      until: "17:00",
+      status: "available",
     },
-    tableNumber: "Table PC1",
-    distance: 750,
-    rating: 4.3,
-    location: {
-      address: "Passeig de Picasso, 21, 08003 Barcelona",
-      coordinates: [2.1871, 41.3875],
-    },
+    tableNumber: "Table 4",
+    distance: 800,
+    rating: 4.7,
   },
   {
     id: "5",
-    name: "Barceloneta Beach Gaming",
-    description: "Play board games with a view of the Mediterranean Sea. A unique gaming experience near the beach.",
-    images: ["/placeholder.svg", "/placeholder.svg"],
-    availability: {
-      status: "available",
-    },
-    tableNumber: "Table BB1",
-    distance: 850,
-    rating: 4.4,
-    location: {
-      address: "Passeig Marítim de la Barceloneta, 08003 Barcelona",
-      coordinates: [2.1900, 41.3780],
-    },
-  },
-  {
-    id: "6",
-    name: "Sagrada Família Game Space",
-    description: "Play with a view of Gaudí's masterpiece. A premium gaming experience near Barcelona's most iconic landmark.",
-    images: ["/placeholder.svg", "/placeholder.svg"],
-    availability: {
-      status: "available",
-    },
-    tableNumber: "Table SF1",
-    distance: 1800,
-    rating: 4.7,
-    location: {
-      address: "Carrer de Mallorca, 401, 08013 Barcelona",
-      coordinates: [2.1744, 41.4036],
-    },
-  },
-  {
-    id: "7",
-    name: "Juego Barcelona",
-    description: "Modern board game café in Gràcia with premium coffee, tapas, and a curated selection of tabletop games.",
+    name: "Student Center Gaming Lounge",
+    description: "A vibrant gaming lounge in the university's student center. Ideal for group board game sessions.",
     images: ["/placeholder.svg", "/placeholder.svg"],
     availability: {
       status: "maintenance",
       until: "Tomorrow",
     },
-    tableNumber: "Table J1",
-    distance: 1250,
-    rating: 4.7,
-    location: {
-      address: "Carrer d'Astúries, 84, 08024 Barcelona",
-      coordinates: [2.1542, 41.4046],
-    },
+    tableNumber: "Table 5",
+    distance: 1500,
+    rating: 4.3,
   },
 ];
 
