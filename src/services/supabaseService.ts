@@ -1,6 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { GamingTable } from "./gamingTableData";
+import { geocodeAddress } from "./geocodingService";
 
 export interface Host {
   id: string;
@@ -68,6 +68,47 @@ export const fetchGamingTables = async () => {
     // to avoid biasing towards venues. Instead, host information can indicate
     // if this is a private table or part of a commercial venue
   }));
+};
+
+// New function to create a gaming table with address geocoding
+export const createGamingTable = async (
+  tableData: {
+    name: string;
+    description?: string;
+    location_address: string;
+    capacity?: number;
+    amenities?: string[];
+    images?: string[];
+    host_id: string;
+  }
+) => {
+  // Try to geocode the address
+  const coordinates = await geocodeAddress(tableData.location_address);
+  
+  if (!coordinates) {
+    throw new Error("Could not geocode the provided address. Please check and try again.");
+  }
+  
+  const [longitude, latitude] = coordinates;
+  
+  const { data, error } = await supabase
+    .from("gaming_tables")
+    .insert([
+      {
+        ...tableData,
+        longitude,
+        latitude,
+        availability_status: "available",
+      },
+    ])
+    .select();
+  
+  if (error) {
+    console.error("Error creating gaming table:", error);
+    throw error;
+  }
+  
+  return data[0];
 };
 
 // Fetch a single gaming table with its host information
