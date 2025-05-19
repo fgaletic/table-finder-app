@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { GamingTable } from "@/services/gamingTableData";
@@ -13,8 +12,8 @@ import { toast } from "sonner";
 
 const Home = () => {
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
-  const [maxDistance, setMaxDistance] = useState<number>(3000); // Increased from 1500 to 3000
-  const [minRating, setMinRating] = useState<number>(1); // Lowered from 3 to 1 for initial load
+  const [maxDistance, setMaxDistance] = useState<number>(5000); // Increased distance range
+  const [minRating, setMinRating] = useState<number>(0); // Accept any rating
 
   // Fetch tables from Supabase
   const { data: tables, isLoading, error, refetch } = useQuery({
@@ -33,12 +32,16 @@ const Home = () => {
   // Log tables data when received
   useEffect(() => {
     console.log(`Home component received ${tables?.length || 0} tables from query`);
-    if (tables?.length) {
-      console.log("Sample table with location:", JSON.stringify({
-        id: tables[0].id,
-        name: tables[0].name,
-        location: tables[0].location
-      }));
+    if (tables && tables.length > 0) {
+      console.log("Tables received in Home:", tables);
+      tables.forEach((table, index) => {
+        console.log(`Table ${index + 1}:`, {
+          id: table.id,
+          name: table.name,
+          location: table.location,
+          coordinates: table.location?.coordinates
+        });
+      });
     } else {
       console.log("No tables data received in Home component");
     }
@@ -57,23 +60,29 @@ const Home = () => {
     const userLocation: [number, number] = [2.1734, 41.3851]; // Barcelona coordinates
     
     return tables.map(table => {
-      if (!table.location || !table.location.coordinates) {
-        console.log("Table missing coordinates:", table.id, table.name);
-        return { ...table, distance: 3000 }; // Default high distance for tables without coordinates
+      try {
+        if (!table.location || !table.location.coordinates) {
+          console.log("Table missing coordinates:", table.id, table.name);
+          return { ...table, distance: 5000 }; // Default high distance for tables without coordinates
+        }
+        
+        // Calculate distance
+        const distance = calculateDistance(
+          userLocation,
+          table.location.coordinates
+        );
+        
+        const distanceInMeters = Math.round(distance * 1000);
+        console.log(`Table ${table.name} distance: ${distanceInMeters}m`);
+        
+        return {
+          ...table,
+          distance: distanceInMeters, // Convert km to meters
+        } as GamingTable & { distance: number };
+      } catch (error) {
+        console.error(`Error processing table ${table.id}:`, error);
+        return { ...table, distance: 5000 };
       }
-      
-      // Calculate distance
-      const distance = calculateDistance(
-        userLocation,
-        table.location.coordinates
-      );
-      
-      console.log(`Table ${table.name} distance: ${Math.round(distance * 1000)}m`);
-      
-      return {
-        ...table,
-        distance: Math.round(distance * 1000), // Convert km to meters
-      } as GamingTable & { distance: number };
     });
   }, [tables]);
 
@@ -101,23 +110,14 @@ const Home = () => {
   }
 
   const filteredTables = useMemo(() => {
-    const filtered = (processedTables || []).filter(
-      (table) => {
-        // Only filter by distance if the table has a distance property
-        const passesDistanceFilter = !table.distance || table.distance <= maxDistance;
-        // Only filter by rating if the table has a rating property
-        const passesRatingFilter = !table.rating || table.rating >= minRating;
-        
-        return passesDistanceFilter && passesRatingFilter;
-      }
-    );
+    console.log("Filtering tables with maxDistance:", maxDistance, "minRating:", minRating);
+    console.log("Tables before filtering:", processedTables.length);
     
-    console.log("Filtering tables:", {
-      total: processedTables.length,
-      filtered: filtered.length,
-      maxDistance,
-      minRating
-    });
+    // Apply minimal filtering - just ensure tables exist
+    const filtered = processedTables.filter(table => table !== undefined && table !== null);
+    
+    console.log("Tables after basic filtering:", filtered.length);
+    console.log("Filtered tables:", filtered);
     
     return filtered;
   }, [processedTables, maxDistance, minRating]);
@@ -125,7 +125,14 @@ const Home = () => {
   useEffect(() => {
     console.log("Filtered tables count:", filteredTables.length);
     if (filteredTables.length > 0) {
-      console.log("First filtered table:", filteredTables[0].name);
+      filteredTables.forEach((table, index) => {
+        console.log(`Filtered table ${index + 1}:`, {
+          id: table.id,
+          name: table.name,
+          distance: table.distance,
+          rating: table.rating
+        });
+      });
     } else {
       console.log("No tables passed the filter criteria");
     }
@@ -155,7 +162,7 @@ const Home = () => {
           <label className="text-sm font-medium">Distance (meters)</label>
           <SliderPicker
             min={100}
-            max={3000}
+            max={5000}
             step={100}
             value={maxDistance}
             onChange={setMaxDistance}
@@ -165,7 +172,7 @@ const Home = () => {
         <div className="space-y-2">
           <label className="text-sm font-medium">Minimum Rating</label>
           <SliderPicker
-            min={1}
+            min={0}
             max={5}
             step={0.5}
             value={minRating}
@@ -210,9 +217,10 @@ const Home = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <p className="text-muted-foreground">No gaming tables match your filters</p>
-                <Button variant="link" onClick={() => { setMaxDistance(3000); setMinRating(1); }}>
-                  Reset filters
+                <p className="text-muted-foreground">No gaming tables available</p>
+                <p className="text-muted-foreground text-sm mt-2">Try refreshing or check back later</p>
+                <Button variant="link" onClick={handleRefresh} className="mt-2">
+                  Refresh data
                 </Button>
               </div>
             )}

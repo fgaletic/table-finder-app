@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { GamingTable } from "./gamingTableData";
 
@@ -15,6 +14,7 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
     }
     
     console.log("Raw data from Supabase:", data);
+    console.log("Number of tables returned:", data?.length ?? 0);
     
     // If no data returned from Supabase, fall back to mock data immediately
     if (!data || data.length === 0) {
@@ -25,17 +25,21 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
     
     // Process data into expected format with coordinates
     const tables = data.map(table => {
+      console.log("Processing table:", table.id, table.name);
+      
       // Ensure we have valid coordinates
       const longitude = typeof table.longitude === 'number' ? table.longitude : 2.1734;
       const latitude = typeof table.latitude === 'number' ? table.latitude : 41.3851;
       
+      console.log(`Table ${table.id} coordinates:`, longitude, latitude);
+      
       // Convert availability status to the correct type
       const status = mapAvailabilityStatus(table.availability_status);
       
-      const processedTable = {
+      return {
         id: table.id,
         name: table.name,
-        description: table.description,
+        description: table.description || "No description available",
         images: table.images || ["/placeholder.svg"],
         location: {
           address: table.location_address || "Barcelona, Spain",
@@ -51,22 +55,20 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
         reviewCount: table.review_count || 10,
         host_id: table.host_id
       };
-      
-      return processedTable;
     });
     
     console.log(`Processed ${tables.length} tables from Supabase with coordinates`);
     
-    // Log a sample of the first table for debugging
-    if (tables.length > 0) {
-      console.log("First table sample with coordinates:", 
-        JSON.stringify({
-          id: tables[0].id,
-          name: tables[0].name,
-          coordinates: tables[0].location.coordinates
-        })
-      );
-    }
+    // Log all tables for debugging
+    tables.forEach((table, index) => {
+      console.log(`Table ${index + 1}:`, {
+        id: table.id,
+        name: table.name,
+        coordinates: table.location.coordinates,
+        rating: table.rating,
+        status: table.availability.status
+      });
+    });
     
     return tables;
   } catch (error) {
