@@ -13,8 +13,8 @@ import { toast } from "sonner";
 
 const Home = () => {
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
-  const [maxDistance, setMaxDistance] = useState<number>(1500);
-  const [minRating, setMinRating] = useState<number>(3);
+  const [maxDistance, setMaxDistance] = useState<number>(3000); // Increased from 1500 to 3000
+  const [minRating, setMinRating] = useState<number>(1); // Lowered from 3 to 1 for initial load
 
   // Fetch tables from Supabase
   const { data: tables, isLoading, error, refetch } = useQuery({
@@ -53,15 +53,22 @@ const Home = () => {
     
     console.log(`Processing ${tables.length} tables in Home component`);
     
-    // Barcelona city center coordinates
+    // Barcelona city center coordinates (longitude, latitude)
     const userLocation: [number, number] = [2.1734, 41.3851]; // Barcelona coordinates
     
     return tables.map(table => {
+      if (!table.location || !table.location.coordinates) {
+        console.log("Table missing coordinates:", table.id, table.name);
+        return { ...table, distance: 3000 }; // Default high distance for tables without coordinates
+      }
+      
       // Calculate distance
       const distance = calculateDistance(
         userLocation,
-        table.location?.coordinates || [2.1734, 41.3851]
+        table.location.coordinates
       );
+      
+      console.log(`Table ${table.name} distance: ${Math.round(distance * 1000)}m`);
       
       return {
         ...table,
@@ -93,11 +100,27 @@ const Home = () => {
     return deg * (Math.PI / 180);
   }
 
-  const filteredTables = (processedTables || []).filter(
-    (table) =>
-      (table.distance || 0) <= maxDistance &&
-      (table.rating || 0) >= minRating
-  );
+  const filteredTables = useMemo(() => {
+    const filtered = (processedTables || []).filter(
+      (table) => {
+        // Only filter by distance if the table has a distance property
+        const passesDistanceFilter = !table.distance || table.distance <= maxDistance;
+        // Only filter by rating if the table has a rating property
+        const passesRatingFilter = !table.rating || table.rating >= minRating;
+        
+        return passesDistanceFilter && passesRatingFilter;
+      }
+    );
+    
+    console.log("Filtering tables:", {
+      total: processedTables.length,
+      filtered: filtered.length,
+      maxDistance,
+      minRating
+    });
+    
+    return filtered;
+  }, [processedTables, maxDistance, minRating]);
 
   useEffect(() => {
     console.log("Filtered tables count:", filteredTables.length);

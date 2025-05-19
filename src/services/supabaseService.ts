@@ -32,11 +32,11 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
       // Convert availability status to the correct type
       const status = mapAvailabilityStatus(table.availability_status);
       
-      return {
+      const processedTable = {
         id: table.id,
         name: table.name,
         description: table.description,
-        images: table.images,
+        images: table.images || ["/placeholder.svg"],
         location: {
           address: table.location_address || "Barcelona, Spain",
           coordinates: [longitude, latitude] as [number, number]
@@ -45,12 +45,14 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
           status: status,
           until: table.availability_until
         },
-        capacity: table.capacity,
-        amenities: table.amenities || [],
-        rating: table.rating || 4.5,
+        capacity: table.capacity || 4,
+        amenities: table.amenities || ["WiFi"],
+        rating: table.rating || 4.0,
         reviewCount: table.review_count || 10,
         host_id: table.host_id
       };
+      
+      return processedTable;
     });
     
     console.log(`Processed ${tables.length} tables from Supabase with coordinates`);
@@ -74,6 +76,14 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
     const { getGamingTables } = await import("./gamingTableData");
     return getGamingTables();
   }
+};
+
+// Helper function to map availability status to the correct type
+const mapAvailabilityStatus = (status: string): "available" | "occupied" | "maintenance" => {
+  if (status === "available" || status === "occupied" || status === "maintenance") {
+    return status as "available" | "occupied" | "maintenance";
+  }
+  return "available"; // Default fallback
 };
 
 export const fetchGamingTableById = async (id: string): Promise<GamingTable | null> => {
@@ -101,7 +111,7 @@ export const fetchGamingTableById = async (id: string): Promise<GamingTable | nu
       id: data.id,
       name: data.name,
       description: data.description,
-      images: data.images,
+      images: data.images || ["/placeholder.svg"],
       location: {
         address: data.location_address || "Barcelona, Spain",
         coordinates: [longitude, latitude] as [number, number]
@@ -110,9 +120,9 @@ export const fetchGamingTableById = async (id: string): Promise<GamingTable | nu
         status: mapAvailabilityStatus(data.availability_status),
         until: data.availability_until
       },
-      capacity: data.capacity,
-      amenities: data.amenities || [],
-      rating: data.rating || 4.5,
+      capacity: data.capacity || 4,
+      amenities: data.amenities || ["WiFi"],
+      rating: data.rating || 4.0,
       reviewCount: data.review_count || 10,
       host_id: data.host_id
     };
@@ -122,14 +132,6 @@ export const fetchGamingTableById = async (id: string): Promise<GamingTable | nu
     const { getGamingTableById } = await import("./gamingTableData");
     return getGamingTableById(id);
   }
-};
-
-// Helper function to map availability status to the correct type
-const mapAvailabilityStatus = (status: string): "available" | "occupied" | "maintenance" => {
-  if (status === "available" || status === "occupied" || status === "maintenance") {
-    return status as "available" | "occupied" | "maintenance";
-  }
-  return "available"; // Default fallback
 };
 
 // New function to fetch a table with its host information
