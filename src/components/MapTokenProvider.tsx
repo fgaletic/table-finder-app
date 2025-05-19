@@ -1,10 +1,15 @@
 
 import React, { createContext, useState, useContext, ReactNode } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "./ui/dialog";
+import { toast } from "sonner";
 
 interface MapTokenContextType {
   mapboxToken: string;
   setMapboxToken: (token: string) => void;
   isTokenSet: boolean;
+  showTokenDialog: () => void;
 }
 
 const MapTokenContext = createContext<MapTokenContextType | undefined>(undefined);
@@ -34,6 +39,7 @@ export const MapTokenProvider = ({
   const storedToken = typeof window !== "undefined" ? localStorage.getItem("mapboxToken") : null;
   
   const [mapboxToken, setMapboxTokenState] = useState<string>(storedToken || defaultToken);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const setMapboxToken = (token: string) => {
     // Store token in localStorage for persistence
@@ -41,14 +47,74 @@ export const MapTokenProvider = ({
       localStorage.setItem("mapboxToken", token);
     }
     setMapboxTokenState(token);
+    toast.success("Mapbox token updated successfully!");
+  };
+
+  const showTokenDialog = () => {
+    setIsDialogOpen(true);
   };
 
   const isTokenSet = mapboxToken !== "";
 
   return (
-    <MapTokenContext.Provider value={{ mapboxToken, setMapboxToken, isTokenSet }}>
+    <MapTokenContext.Provider value={{ mapboxToken, setMapboxToken, isTokenSet, showTokenDialog }}>
       {children}
+      <TokenDialog 
+        isOpen={isDialogOpen} 
+        onClose={() => setIsDialogOpen(false)} 
+        currentToken={mapboxToken}
+        onSubmit={setMapboxToken}
+      />
     </MapTokenContext.Provider>
+  );
+};
+
+interface TokenDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  currentToken: string;
+  onSubmit: (token: string) => void;
+}
+
+const TokenDialog = ({ isOpen, onClose, currentToken, onSubmit }: TokenDialogProps) => {
+  const [token, setToken] = useState(currentToken);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(token);
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Set Mapbox Token</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Enter your Mapbox public token. You can find this in your Mapbox account dashboard.
+              </p>
+              <Input
+                id="token"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="Enter Mapbox token"
+                className="w-full"
+              />
+              <p className="text-xs text-muted-foreground">
+                Note: Your token will be stored in localStorage. A demo token is provided but may have usage limits.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit">Save Token</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
