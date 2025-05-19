@@ -36,15 +36,18 @@ const Home = () => {
     if (tables?.length) {
       console.log("Sample table with location:", JSON.stringify({
         id: tables[0].id,
+        name: tables[0].name,
         location: tables[0].location
       }));
+    } else {
+      console.log("No tables data received in Home component");
     }
   }, [tables]);
 
   // Process tables to add distance based on user location
   const processedTables = useMemo(() => {
     if (!tables || tables.length === 0) {
-      console.log("No tables data received in Home component");
+      console.log("No tables data received in Home component for processing");
       return [];
     }
     
@@ -100,6 +103,8 @@ const Home = () => {
     console.log("Filtered tables count:", filteredTables.length);
     if (filteredTables.length > 0) {
       console.log("First filtered table:", filteredTables[0].name);
+    } else {
+      console.log("No tables passed the filter criteria");
     }
   }, [filteredTables]);
 

@@ -4,6 +4,7 @@ import { GamingTable } from "./gamingTableData";
 
 export const fetchGamingTables = async (): Promise<GamingTable[]> => {
   try {
+    console.log("Fetching gaming tables from Supabase...");
     const { data, error } = await supabase
       .from("gaming_tables")
       .select("*");
@@ -13,29 +14,46 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
       throw error;
     }
     
-    console.log("Raw data from Supabase:", data?.length, "tables");
+    console.log("Raw data from Supabase:", data);
+    
+    // If no data returned from Supabase, fall back to mock data immediately
+    if (!data || data.length === 0) {
+      console.log("No tables from Supabase, using mock data");
+      const { getGamingTables } = await import("./gamingTableData");
+      return getGamingTables();
+    }
     
     // Process data into expected format with coordinates
-    const tables = data?.map(table => {
+    const tables = data.map(table => {
       // Ensure we have valid coordinates
       const longitude = typeof table.longitude === 'number' ? table.longitude : 2.1734;
       const latitude = typeof table.latitude === 'number' ? table.latitude : 41.3851;
       
+      // Convert availability status to the correct type
+      const status = mapAvailabilityStatus(table.availability_status);
+      
       return {
-        ...table,
+        id: table.id,
+        name: table.name,
+        description: table.description,
+        images: table.images,
         location: {
           address: table.location_address || "Barcelona, Spain",
           coordinates: [longitude, latitude] as [number, number]
         },
         availability: {
-          status: mapAvailabilityStatus(table.availability_status),
+          status: status,
           until: table.availability_until
         },
-        amenities: table.amenities || []
+        capacity: table.capacity,
+        amenities: table.amenities || [],
+        rating: table.rating || 4.5,
+        reviewCount: table.review_count || 10,
+        host_id: table.host_id
       };
-    }) || [];
+    });
     
-    console.log(`Fetched ${tables.length} tables from Supabase with coordinates`);
+    console.log(`Processed ${tables.length} tables from Supabase with coordinates`);
     
     // Log a sample of the first table for debugging
     if (tables.length > 0) {
@@ -46,13 +64,6 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
           coordinates: tables[0].location.coordinates
         })
       );
-    }
-    
-    // If no tables returned from Supabase, fall back to mock data
-    if (tables.length === 0) {
-      console.log("No tables from Supabase, using mock data");
-      const { getGamingTables } = await import("./gamingTableData");
-      return getGamingTables();
     }
     
     return tables;
@@ -87,7 +98,10 @@ export const fetchGamingTableById = async (id: string): Promise<GamingTable | nu
     const latitude = typeof data.latitude === 'number' ? data.latitude : 41.3851;
     
     return {
-      ...data,
+      id: data.id,
+      name: data.name,
+      description: data.description,
+      images: data.images,
       location: {
         address: data.location_address || "Barcelona, Spain",
         coordinates: [longitude, latitude] as [number, number]
@@ -96,7 +110,11 @@ export const fetchGamingTableById = async (id: string): Promise<GamingTable | nu
         status: mapAvailabilityStatus(data.availability_status),
         until: data.availability_until
       },
-      amenities: data.amenities || []
+      capacity: data.capacity,
+      amenities: data.amenities || [],
+      rating: data.rating || 4.5,
+      reviewCount: data.review_count || 10,
+      host_id: data.host_id
     };
   } catch (error) {
     console.error("Error in fetchGamingTableById service:", error);
