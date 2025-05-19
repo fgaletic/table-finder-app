@@ -37,13 +37,13 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
       console.log("Initializing map with token:", mapboxToken.substring(0, 10) + "...");
       console.log("Tables to display:", gamingTables.length);
       
-      // Initialize map
+      // Initialize map with Barcelona default center
       mapboxgl.accessToken = mapboxToken;
       
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: defaultCenter,
+        center: defaultCenter, // Always initialize with Barcelona center
         zoom: 13,
       });
 
@@ -102,27 +102,43 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
     };
   }, [mapContainer, mapboxToken, onError, gamingTables.length]);
 
-  // Fit bounds when tables or selection changes
+  // Fit bounds when tables or selection changes - but only for Barcelona-area coordinates
   useEffect(() => {
     if (!map.current || !mapReady) return;
 
     console.log("Fitting bounds with tables:", gamingTables.length);
     
-    // Fit bounds to include all markers if there are any
+    // Filter for tables that have valid Barcelona-area coordinates
     try {
-      const tablesWithCoordinates = gamingTables.filter(
-        table => table.location && table.location.coordinates
+      const barcelonaAreaTables = gamingTables.filter(
+        table => {
+          // Check if table has coordinates
+          if (!table.location || !table.location.coordinates) {
+            return false;
+          }
+          
+          // Get the coordinates
+          const [lng, lat] = table.location.coordinates;
+          
+          // Check if the coordinates are in the Barcelona area (rough bounds check)
+          const isInBarcelonaArea = 
+            lng > 1.0 && lng < 3.0 && // Barcelona longitude range 
+            lat > 40.0 && lat < 42.5; // Barcelona latitude range
+          
+          if (!isInBarcelonaArea) {
+            console.log(`Table ${table.id} coordinates outside Barcelona area:`, table.location.coordinates);
+          }
+          
+          return isInBarcelonaArea;
+        }
       );
       
-      console.log("Tables with coordinates:", tablesWithCoordinates.length);
-      console.log("Coordinates sample:", tablesWithCoordinates.length > 0 
-        ? JSON.stringify(tablesWithCoordinates[0].location?.coordinates) 
-        : "None");
+      console.log("Tables with Barcelona-area coordinates:", barcelonaAreaTables.length);
       
-      if (tablesWithCoordinates.length > 0) {
+      if (barcelonaAreaTables.length > 0) {
         const bounds = new mapboxgl.LngLatBounds();
         
-        tablesWithCoordinates.forEach(table => {
+        barcelonaAreaTables.forEach(table => {
           if (table.location && table.location.coordinates) {
             bounds.extend(table.location.coordinates);
           }
@@ -134,6 +150,7 @@ export const MapContainer = ({ gamingTables, mapboxToken, onError }: MapContaine
         });
       } else {
         // If no tables with coordinates, center on Barcelona
+        console.log("No tables with Barcelona coordinates, centering on Barcelona default");
         map.current.flyTo({
           center: defaultCenter,
           zoom: 13,

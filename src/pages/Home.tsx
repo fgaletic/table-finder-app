@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { GamingTable } from "@/services/gamingTableData";
@@ -113,11 +114,27 @@ const Home = () => {
     console.log("Filtering tables with maxDistance:", maxDistance, "minRating:", minRating);
     console.log("Tables before filtering:", processedTables.length);
     
-    // Apply minimal filtering - just ensure tables exist
-    const filtered = processedTables.filter(table => table !== undefined && table !== null);
+    if (processedTables.length === 0) {
+      return [];
+    }
     
-    console.log("Tables after basic filtering:", filtered.length);
-    console.log("Filtered tables:", filtered);
+    // Apply distance and rating filters
+    const filtered = processedTables.filter(table => {
+      const passesDistanceFilter = !table.distance || table.distance <= maxDistance;
+      const passesRatingFilter = !table.rating || table.rating >= minRating;
+      
+      if (!passesDistanceFilter) {
+        console.log(`Table ${table.name} filtered out by distance: ${table.distance}m > ${maxDistance}m`);
+      }
+      
+      if (!passesRatingFilter) {
+        console.log(`Table ${table.name} filtered out by rating: ${table.rating} < ${minRating}`);
+      }
+      
+      return passesDistanceFilter && passesRatingFilter;
+    });
+    
+    console.log("Tables after filtering:", filtered.length);
     
     return filtered;
   }, [processedTables, maxDistance, minRating]);
@@ -130,7 +147,8 @@ const Home = () => {
           id: table.id,
           name: table.name,
           distance: table.distance,
-          rating: table.rating
+          rating: table.rating,
+          coordinates: table.location?.coordinates
         });
       });
     } else {

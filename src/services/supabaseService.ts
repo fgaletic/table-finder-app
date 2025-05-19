@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { GamingTable } from "./gamingTableData";
 
@@ -16,11 +17,10 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
     console.log("Raw data from Supabase:", data);
     console.log("Number of tables returned:", data?.length ?? 0);
     
-    // If no data returned from Supabase, fall back to mock data immediately
+    // If no data returned from Supabase, don't fall back to mock data
     if (!data || data.length === 0) {
-      console.log("No tables from Supabase, using mock data");
-      const { getGamingTables } = await import("./gamingTableData");
-      return getGamingTables();
+      console.log("No tables from Supabase");
+      return [];
     }
     
     // Process data into expected format with coordinates
@@ -73,10 +73,9 @@ export const fetchGamingTables = async (): Promise<GamingTable[]> => {
     return tables;
   } catch (error) {
     console.error("Error in fetchGamingTables service:", error);
-    // Fall back to mock data
-    console.log("Error fetching from Supabase, using mock data");
-    const { getGamingTables } = await import("./gamingTableData");
-    return getGamingTables();
+    // Return an empty array instead of falling back to mock data
+    console.log("Error fetching from Supabase, returning empty array");
+    return [];
   }
 };
 
@@ -130,9 +129,7 @@ export const fetchGamingTableById = async (id: string): Promise<GamingTable | nu
     };
   } catch (error) {
     console.error("Error in fetchGamingTableById service:", error);
-    // Fall back to mock data
-    const { getGamingTableById } = await import("./gamingTableData");
-    return getGamingTableById(id);
+    return null;
   }
 };
 
@@ -166,27 +163,7 @@ export const fetchGamingTableWithHost = async (id: string) => {
     return { table, host: null };
   } catch (error) {
     console.error("Error fetching table with host:", error);
-    
-    // Fall back to mock data
-    const { getGamingTableById } = await import("./gamingTableData");
-    const table = await getGamingTableById(id);
-    
-    if (!table) {
-      return { table: null, host: null };
-    }
-    
-    // Mock host data
-    const host = {
-      id: "host-1",
-      name: "Barcelona Game Host",
-      bio: "Board game enthusiast hosting tables across Barcelona.",
-      email: "host@example.com",
-      avatar_url: null,
-      created_at: new Date().toISOString(),
-      phone: null
-    };
-    
-    return { table, host };
+    return { table: null, host: null };
   }
 };
 
@@ -213,12 +190,7 @@ export const createBooking = async (bookingData: {
     return data;
   } catch (error) {
     console.error("Error in createBooking service:", error);
-    // Mock successful booking for demo purposes
-    return {
-      id: `booking-${Date.now()}`,
-      ...bookingData,
-      created_at: new Date().toISOString()
-    };
+    throw error;
   }
 };
 
@@ -247,12 +219,6 @@ export const sendMessage = async (messageData: {
     return data;
   } catch (error) {
     console.error("Error in sendMessage service:", error);
-    // Mock successful message for demo purposes
-    return {
-      id: `message-${Date.now()}`,
-      ...messageData,
-      read: false,
-      created_at: new Date().toISOString()
-    };
+    throw error;
   }
 };
