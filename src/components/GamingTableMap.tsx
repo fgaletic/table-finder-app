@@ -29,14 +29,14 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
   
   // Convert longitude, latitude to X, Y positions on our mock map (used when real map fails)
   const getPositionFromCoordinates = (coords: [number, number]) => {
-    // NYC coordinates as center reference point (approx)
-    const centerLng = -74.0060; 
-    const centerLat = 40.7128;
+    // Barcelona coordinates as center reference point (approx)
+    const centerLng = 2.1734; 
+    const centerLat = 41.3851;
     
     // Scale factors - adjust these to control sensitivity of map movements
     // These are arbitrary values that work for our mock map display
-    const lngScale = 400; // Controls horizontal spread
-    const latScale = 300; // Controls vertical spread
+    const lngScale = 1200; // Controls horizontal spread (higher value for Barcelona's smaller area)
+    const latScale = 1000; // Controls vertical spread (higher value for Barcelona's smaller area)
     
     // Calculate percentage position within our map view
     // We add an offset to make the positions more centered on the map
@@ -86,6 +86,37 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
   useEffect(() => {
     setSelectedId(null);
   }, [gamingTables]);
+  
+  // Dynamically add CSS for marker positions
+  useEffect(() => {
+    if (!positionedGamingTables) return;
+    
+    // Create style element if it doesn't exist
+    let styleEl = document.getElementById('dynamic-marker-styles');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'dynamic-marker-styles';
+      document.head.appendChild(styleEl);
+    }
+    
+    // Generate CSS rules for each marker
+    const cssRules = positionedGamingTables.map(table => 
+      `.custom-marker-${table.id} {
+        top: ${table.posY};
+        left: ${table.posX};
+      }`
+    ).join('\n');
+    
+    // Update style element
+    styleEl.textContent = cssRules;
+    
+    // Clean up on unmount
+    return () => {
+      if (styleEl && document.head.contains(styleEl)) {
+        document.head.removeChild(styleEl);
+      }
+    };
+  }, [positionedGamingTables]);
 
   // Switch between real MapBox map and mock map
   return (
@@ -95,9 +126,9 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
         <MapboxMap 
           gamingTables={gamingTables} 
           isLoading={isLoading}
-          // Default center to NYC, but you can calculate the actual center point based on tables
-          center={[-74.0060, 40.7128]} 
-          zoom={12}
+          // Default center to Barcelona
+          center={[2.1734, 41.3851]} 
+          zoom={13}
         />
       ) : (
         <>
@@ -117,11 +148,27 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
             <div className="absolute top-[40%] left-[85%] w-[10%] h-[10%] bg-gray-100 rounded-sm"></div>
           </div>
 
+          {/* Barcelona Indicator with Enhanced Mode Toggle */}
+          <div className="absolute top-2 right-2 flex gap-2">
+            <button 
+              onClick={() => {
+                // Toggle advanced Barcelona mode
+                localStorage.setItem("barcelonaAdvancedMode", 
+                  localStorage.getItem("barcelonaAdvancedMode") === "true" ? "false" : "true");
+                // Force re-render (in a real app, use state)
+                window.location.reload();
+              }}
+              className="barcelona-indicator cursor-pointer hover:bg-yellow-200"
+            >
+              <MapPin className="h-3 w-3" /> Barcelona Mode
+            </button>
+          </div>
+
           {/* Banner about upgrading to Mapbox */}
-          <div className="absolute top-2 left-2 right-2 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-md text-sm text-center shadow-sm">
+          <div className="absolute top-2 left-2 right-20 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-md text-sm text-center shadow-sm">
             {isTokenSet ? 
               <div className="flex flex-col gap-1">
-                <p>Using mock map. Click below to use real MapBox for accurate geographic display.</p>
+                <p>Using Barcelona mock map. Click below to use real MapBox for accurate geographic display.</p>
                 <button 
                   onClick={() => setUseRealMap(true)}
                   className="text-xs bg-blue-600 text-white py-1 px-2 rounded hover:bg-blue-700"
@@ -131,7 +178,7 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
               </div>
               : 
               <div className="flex flex-col gap-1">
-                <p>Set a valid MapBox token to enable real maps.</p>
+                <p>Set a valid MapBox token to enable real Barcelona maps.</p>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -175,8 +222,7 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
         return (
           <div
             key={gamingTable.id}
-            className={`gaming-table-marker marker-size-${sizeClass}`}
-            style={{ top: gamingTable.posY, left: gamingTable.posX }}
+            className={`gaming-table-marker marker-size-${sizeClass} custom-marker-${gamingTable.id}`}
             onClick={() => handleMarkerClick(gamingTable.id)}
           >
             <div className="relative flex items-center justify-center">

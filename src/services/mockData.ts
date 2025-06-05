@@ -6,117 +6,163 @@ import { GamingTable } from "./gamingTableData";
 export const MOCK_GAMING_TABLES: GamingTable[] = [
   {
     id: "gt-001",
-    name: "Adventure Quest RPG Table",
-    description: "Large gaming table perfect for RPG sessions. Features built-in dice trays and cup holders.",
+    name: "Table Titans Gaming Lounge",
+    description: "Premium gaming table in L'Eixample district with authentic Catalan design. The table features a neoprene surface, cup holders, and dice trays for the perfect 6-player gaming experience. Near Passeig de Gràcia.",
     images: ["https://picsum.photos/seed/gt-001/800/600"],
-    capacity: 8,
-    price_per_hour: 15,
-    equipment: ["Dice sets", "RPG manuals", "Battle maps"],
+    capacity: 6,
     host_id: "host-001",
-    host_name: "Dragon's Den Gaming",
+    venueAddress: "Carrer de Provença 165, Barcelona, 08036",
     location: {
-      address: "123 Boardgame Blvd, Brooklyn, NY 10001",
-      coordinates: [-73.9812, 40.7378]
+      address: "Carrer de Provença 165, Barcelona, 08036",
+      coordinates: [2.1533, 41.3891]
     },
     availability: {
-      status: "available",
-      days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      hours: "12:00-22:00"
+      status: "available"
     },
     rating: 4.8,
-    reviews_count: 56,
-    amenities: ["Free WiFi", "Snacks available", "Air conditioning"]
+    reviewCount: 56,
+    amenities: ["Free WiFi", "Local craft beer selection", "Air conditioning", "100+ board games collection", "Catalan snacks", "Multilingual game hosts"],
+    distance: 0
   },
   {
     id: "gt-002",
-    name: "Tournament Chess & Strategy",
-    description: "Professional chess table with tournament-grade equipment. Perfect for chess tournaments or casual play.",
+    name: "Euro Games Premium Table",
+    description: "Intimate 4-player table situated in a quiet café in Eixample Dreta. Specializes in European strategy games with a collection curated by local game designers. Features built-in scoring tracks and storage for game pieces.",
     images: ["https://picsum.photos/seed/gt-002/800/600"],
-    capacity: 2,
-    price_per_hour: 10,
-    equipment: ["Tournament chess set", "Chess clock", "Strategy game collection"],
+    capacity: 4,
     host_id: "host-002",
-    host_name: "Checkmate Club",
+    venueAddress: "Carrer de Balmes 119, Barcelona, 08008",
     location: {
-      address: "45 Strategy Street, Manhattan, NY 10012",
-      coordinates: [-73.9965, 40.7295]
+      address: "Carrer de Balmes 119, Barcelona, 08008",
+      coordinates: [2.1545, 41.3950]
     },
     availability: {
-      status: "available",
-      days: ["Tuesday", "Thursday", "Saturday", "Sunday"],
-      hours: "14:00-20:00"
+      status: "available"
     },
-    rating: 4.5,
-    reviews_count: 32,
-    amenities: ["Coffee service", "Quiet environment", "Chess coaching available"]
+    rating: 4.6,
+    reviewCount: 42,
+    amenities: ["Specialty coffee & tea", "Quiet atmosphere", "Game tutorials in multiple languages", "Euro games collection", "Digital score trackers", "Organic snacks"],
+    distance: 0
   },
   {
     id: "gt-003",
-    name: "Family Game Night Table",
-    description: "Spacious table ideal for family board games. Child-friendly with a wide selection of games for all ages.",
+    name: "Family Game Zone",
+    description: "Spacious 6-player table on Barcelona's iconic Diagonal avenue. Family-friendly space with games in multiple languages (Catalan, Spanish, English). Special Sunday afternoon sessions include traditional Catalan games and local snacks.",
     images: ["https://picsum.photos/seed/gt-003/800/600"],
     capacity: 6,
-    price_per_hour: 12,
-    equipment: ["Family board games", "Card games", "Drawing supplies"],
     host_id: "host-003",
-    host_name: "Family Fun Center",
+    venueAddress: "Avinguda Diagonal 512, Barcelona, 08006",
     location: {
-      address: "78 Joy Avenue, Queens, NY 11101",
-      coordinates: [-73.9456, 40.7474]
+      address: "Avinguda Diagonal 512, Barcelona, 08006",
+      coordinates: [2.1436, 41.3975]
     },
     availability: {
-      status: "booked",
-      days: ["Wednesday", "Friday", "Saturday", "Sunday"],
-      hours: "10:00-18:00"
+      status: "occupied",
+      until: "2023-06-15T18:00:00"
     },
     rating: 4.9,
-    reviews_count: 87,
-    amenities: ["Kid-friendly snacks", "Play area for toddlers", "Family restrooms"]
+    reviewCount: 87,
+    amenities: ["Traditional Catalan snacks", "Children's play area", "Family restrooms", "Games in Spanish/Catalan/English", "Drawing activities", "Weekend game workshops"],
+    distance: 0
   },
   {
     id: "gt-004",
-    name: "Miniatures Wargaming Battlefield",
-    description: "Large custom battlefield for miniatures wargaming with interchangeable terrain features.",
+    name: "Strategy Masters Table",
+    description: "Upscale 4-player table on the charming pedestrian street of Enric Granados. Perfect for serious strategy gamers with soundproof room and premium components. Hosts regular strategy game nights focusing on Mediterranean-themed games.",
     images: ["https://picsum.photos/seed/gt-004/800/600"],
     capacity: 4,
-    price_per_hour: 18,
-    equipment: ["Terrain sets", "Measuring tools", "Rulebooks"],
     host_id: "host-004",
-    host_name: "Battlefield Hobbies",
+    venueAddress: "Carrer d'Enric Granados 21, Barcelona, 08007",
     location: {
-      address: "230 Tactics Terrace, Bronx, NY 10451",
-      coordinates: [-73.9278, 40.8298]
+      address: "Carrer d'Enric Granados 21, Barcelona, 08007",
+      coordinates: [2.1569, 41.3877]
     },
     availability: {
-      status: "available",
-      days: ["Monday", "Wednesday", "Friday", "Saturday"],
-      hours: "15:00-23:00"
+      status: "available"
     },
     rating: 4.7,
-    reviews_count: 43,
-    amenities: ["Painting station", "Model storage", "Reference library"]
+    reviewCount: 43,
+    amenities: ["Mediterranean tapas menu", "Local wine selection", "Strategy game library", "Gaming accessories", "Rulebooks in 5 languages", "Private gaming room"],
+    distance: 0
   },
   {
     id: "gt-005",
-    name: "Poker Night Professional Table",
-    description: "Professional-grade poker table with comfortable seating and high-quality chips.",
+    name: "Classic RPG Gaming Table",
+    description: "Immersive 6-player RPG table in Sant Gervasi-Galvany district with ambient lighting that changes based on game scenarios. Features professional sound system and digital mapping tools. Popular for D&D campaigns and one-shot adventures.",
     images: ["https://picsum.photos/seed/gt-005/800/600"],
-    capacity: 8,
-    price_per_hour: 25,
-    equipment: ["Professional chip set", "Card decks", "Dealer button"],
+    capacity: 6,
     host_id: "host-005",
-    host_name: "Royal Flush Casino",
+    venueAddress: "Carrer de Muntaner 256, Barcelona, 08021",
     location: {
-      address: "555 Card Street, Staten Island, NY 10301",
-      coordinates: [-74.0776, 40.6413]
+      address: "Carrer de Muntaner 256, Barcelona, 08021",
+      coordinates: [2.1490, 41.3926]
     },
     availability: {
-      status: "available",
-      days: ["Thursday", "Friday", "Saturday"],
-      hours: "18:00-02:00"
+      status: "available"
     },
-    rating: 4.6,
-    reviews_count: 29,
-    amenities: ["Bar service", "Smoking area", "Private room"]
+    rating: 4.9,
+    reviewCount: 38,
+    amenities: ["Fantasy-themed cocktails", "Immersive ambiance", "Character creation assistance", "Premium DM screen", "3D-printed terrain", "Custom miniatures", "Soundtrack system"],
+    distance: 0
+  },
+  {
+    id: "gt-006",
+    name: "Tournament Ready Table",
+    description: "Competition-grade 4-player table in the Sagrada Familia neighborhood. Features built-in tournament timers, score displays, and professional game components. Hosts weekly card game tournaments with local gaming community.",
+    images: ["https://picsum.photos/seed/gt-006/800/600"],
+    capacity: 4,
+    host_id: "host-006",
+    venueAddress: "Carrer de València 401, Barcelona, 08013",
+    location: {
+      address: "Carrer de València 401, Barcelona, 08013",
+      coordinates: [2.1753, 41.4015]
+    },
+    availability: {
+      status: "available"
+    },
+    rating: 4.7,
+    reviewCount: 52,
+    amenities: ["Gamer energy drinks", "Tournament organization", "Professional timers", "Official playmats", "Streaming setup", "Card sleeves", "Prize support"],
+    distance: 0
+  },
+  {
+    id: "gt-007",
+    name: "Gothic Quarter Gaming Table",
+    description: "Authentic 6-player medieval-style table in a 14th-century building in the heart of Barcelona's Gothic Quarter. Themed environment with stone walls, wooden beams, and period-appropriate decorations. Specializes in historical and fantasy games.",
+    images: ["https://picsum.photos/seed/gt-007/800/600"],
+    capacity: 6,
+    host_id: "host-007",
+    venueAddress: "Carrer del Call 10, Barcelona, 08002",
+    location: {
+      address: "Carrer del Call 10, Barcelona, 08002",
+      coordinates: [2.1752, 41.3834]
+    },
+    availability: {
+      status: "available"
+    },
+    rating: 4.8,
+    reviewCount: 47,
+    amenities: ["14th-century venue", "Medieval-inspired beverages", "Ambient music", "Historically accurate games", "Custom wooden pieces", "Candlelit gaming experience"],
+    distance: 0
+  },
+  {
+    id: "gt-008",
+    name: "Beachside Gaming Table",
+    description: "Breezy 4-player table in Barceloneta with views of the Mediterranean. Perfect for casual games while enjoying the sea air. Features adjustable sunshade and weatherproof game components. Popular with tourists and locals for light games and tapas.",
+    images: ["https://picsum.photos/seed/gt-008/800/600"],
+    capacity: 4,
+    host_id: "host-008",
+    venueAddress: "Passeig Joan de Borbó 39, Barcelona, 08003",
+    location: {
+      address: "Passeig Joan de Borbó 39, Barcelona, 08003",
+      coordinates: [2.1885, 41.3792]
+    },
+    availability: {
+      status: "available"
+    },
+    rating: 4.5,
+    reviewCount: 63,
+    amenities: ["Mediterranean Sea view", "Fresh seafood tapas", "Outdoor seating", "Beach-themed games", "Sangria service", "Quick party games"],
+    distance: 0
   }
 ];
