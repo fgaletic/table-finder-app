@@ -11,6 +11,25 @@ Find and book the perfect gaming table for your next board game night.
 - **Repository:** [GitHub link here]
 - **Live URL:** [Deployment link here]
 
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```sh
+# MapBox token for maps and geocoding
+VITE_MAPBOX_TOKEN=your_mapbox_token_here
+```
+
+To get a MapBox token:
+
+1. Sign up at [mapbox.com](https://www.mapbox.com/signup)
+2. Go to your account dashboard
+3. Create a token with these scopes:
+   - Styles:read
+   - Fonts:read
+   - Vision:read
+   - Geocoding:read
+
 ## Features
 
 - Browse and search for gaming tables

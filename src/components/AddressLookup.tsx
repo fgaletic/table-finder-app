@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { geocodeAddress } from "@/services/geocodingService";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Loader2, MapPin, Search } from "lucide-react";
+import { useMapToken } from "@/components/MapTokenProvider";
 
 interface AddressLookupProps {
   onSelectLocation: (address: string, coordinates: [number, number]) => void;
@@ -21,15 +22,15 @@ export const AddressLookup = ({
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<Array<{ place_name: string, center: [number, number] }>>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const { mapboxToken } = useMapToken(); // Get the MapBox token from context
 
   const lookupAddress = async () => {
     if (!address.trim()) return;
     
     setIsLoading(true);
     try {
-      // For a real implementation, we'd fetch suggestions from the Mapbox API
-      // This is a simplified version that just geocodes the address
-      const coordinates = await geocodeAddress(address);
+      // Use the Mapbox geocoding API with our token from the provider
+      const coordinates = await geocodeAddress(address, mapboxToken);
       if (coordinates) {
         onSelectLocation(address, coordinates);
         setIsOpen(false);

@@ -22,13 +22,15 @@ interface MapTokenProviderProps {
   defaultToken?: string;
 }
 
-// This is a fallback public token for demo purposes
-// In production, you should use your own token or fetch from environment variables
+// Get token from environment variables or use fallback for development
+// In production, you should always use your own token from environment variables
+const ENV_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 const DEMO_TOKEN = "pk.eyJ1IjoibG92YWJsZS1kZW1vIiwiYSI6ImNsazE0dGVnbDBhYXYzZGticDdkZjRnb3YifQ.lb4OjDvAFznA3fCebOgSng";
+const DEFAULT_TOKEN = ENV_TOKEN || DEMO_TOKEN;
 
 export const MapTokenProvider = ({ 
   children, 
-  defaultToken = DEMO_TOKEN 
+  defaultToken = DEFAULT_TOKEN 
 }: MapTokenProviderProps) => {
   // Try to get token from localStorage first
   const storedToken = typeof window !== "undefined" ? localStorage.getItem("mapboxToken") : null;

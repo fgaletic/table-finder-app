@@ -1,20 +1,33 @@
 
 import { toast } from "sonner";
 
-// You'll need to provide a Mapbox access token
-// This should be a public token that can be exposed in client-side code
-// See: https://docs.mapbox.com/help/getting-started/access-tokens/
-const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoibG92YWJsZS1kZW1vIiwiYSI6ImNsazE0dGVnbDBhYXYzZGticDdkZjRnb3YifQ.lb4OjDvAFznA3fCebOgSng";
+// Get token from environment variables if available
+const ENV_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+// Default fallback token - your application should use the token from MapTokenProvider or env
+const MAPBOX_ACCESS_TOKEN = ENV_TOKEN || "pk.eyJ1IjoibG92YWJsZS1kZW1vIiwiYSI6ImNsazE0dGVnbDBhYXYzZGticDdkZjRnb3YifQ.lb4OjDvAFznA3fCebOgSng";
+
+// Helper function to get MapBox token from localStorage if available
+const getMapboxToken = (): string => {
+  // Try to get token from localStorage
+  if (typeof window !== "undefined") {
+    const storedToken = localStorage.getItem("mapboxToken");
+    if (storedToken) return storedToken;
+  }
+  return MAPBOX_ACCESS_TOKEN;
+};
 
 /**
  * Convert an address to coordinates using Mapbox geocoding API
  */
-export const geocodeAddress = async (address: string): Promise<[number, number] | null> => {
+export const geocodeAddress = async (address: string, customToken?: string): Promise<[number, number] | null> => {
   if (!address) return null;
   
   try {
+    // Use provided token, or get token from localStorage
+    const token = customToken || getMapboxToken();
+    
     const encodedAddress = encodeURIComponent(address);
-    const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${MAPBOX_ACCESS_TOKEN}`);
+    const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodedAddress}.json?access_token=${token}`);
     
     if (!response.ok) {
       throw new Error(`Geocoding API returned status: ${response.status}`);
@@ -39,13 +52,16 @@ export const geocodeAddress = async (address: string): Promise<[number, number] 
 /**
  * Convert coordinates to an address using Mapbox reverse geocoding API
  */
-export const reverseGeocode = async (coordinates: [number, number]): Promise<string | null> => {
+export const reverseGeocode = async (coordinates: [number, number], customToken?: string): Promise<string | null> => {
   if (!coordinates) return null;
   
   try {
+    // Use provided token, or get token from localStorage
+    const token = customToken || getMapboxToken();
+    
     const [longitude, latitude] = coordinates;
     const response = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}`
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${token}`
     );
     
     if (!response.ok) {
