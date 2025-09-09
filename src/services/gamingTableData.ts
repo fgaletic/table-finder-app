@@ -42,8 +42,8 @@ const mockGamingVenues: GamingVenue[] = [
     id: "v1",
     name: "Downtown Board Game Café",
     location: {
-      address: "123 Main St, Downtown",
-      coordinates: [-74.006, 40.7128],
+      address: "Carrer de Balmes 123, Barcelona, 08008",
+      coordinates: [2.1545, 41.3950],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
     rating: 4.8,
@@ -60,8 +60,8 @@ const mockGamingVenues: GamingVenue[] = [
         availability: { status: "available" },
         amenities: ["Snacks", "WiFi", "Power Outlets"],
         location: {
-          address: "123 Main St, Downtown",
-          coordinates: [-74.006, 40.7128],
+          address: "Carrer de Balmes 123, Barcelona, 08008",
+          coordinates: [2.1545, 41.3950],
         },
         distance: 350,
         rating: 4.8
@@ -74,8 +74,8 @@ const mockGamingVenues: GamingVenue[] = [
         availability: { status: "available" },
         amenities: ["Snacks", "WiFi", "Power Outlets"],
         location: {
-          address: "123 Main St, Downtown",
-          coordinates: [-74.006, 40.7128],
+          address: "Carrer de Balmes 123, Barcelona, 08008",
+          coordinates: [2.1545, 41.3950],
         },
         distance: 350,
         rating: 4.8
@@ -86,8 +86,8 @@ const mockGamingVenues: GamingVenue[] = [
     id: "v2",
     name: "Mall Gaming Zone",
     location: {
-      address: "456 Shopping Mall, Upper Level",
-      coordinates: [-73.986, 40.7328],
+      address: "Avinguda Diagonal 456, Barcelona, 08006",
+      coordinates: [2.1436, 41.3975],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
     rating: 4.2,
@@ -104,8 +104,8 @@ const mockGamingVenues: GamingVenue[] = [
         availability: { status: "occupied", until: "3:30 PM" },
         amenities: ["Game Rentals", "Snack Bar", "Tournaments"],
         location: {
-          address: "456 Shopping Mall, Upper Level",
-          coordinates: [-73.986, 40.7328],
+          address: "Avinguda Diagonal 456, Barcelona, 08006",
+          coordinates: [2.1436, 41.3975],
         },
         distance: 620,
         rating: 4.2
@@ -118,8 +118,8 @@ const mockGamingVenues: GamingVenue[] = [
         availability: { status: "available" },
         amenities: ["Game Rentals", "Snack Bar", "Tournaments"],
         location: {
-          address: "456 Shopping Mall, Upper Level",
-          coordinates: [-73.986, 40.7328],
+          address: "Avinguda Diagonal 456, Barcelona, 08006",
+          coordinates: [2.1436, 41.3975],
         },
         distance: 620,
         rating: 4.2
@@ -130,8 +130,8 @@ const mockGamingVenues: GamingVenue[] = [
     id: "v3",
     name: "Student Center Gaming Lounge",
     location: {
-      address: "789 University Ave",
-      coordinates: [-74.106, 40.7528],
+      address: "Carrer de Muntaner 789, Barcelona, 08021",
+      coordinates: [2.1490, 41.3926],
     },
     images: ["/placeholder.svg", "/placeholder.svg"],
     rating: 4.5,
@@ -148,8 +148,8 @@ const mockGamingVenues: GamingVenue[] = [
         availability: { status: "maintenance", until: "Tomorrow" },
         amenities: ["Free Game Library", "Student Discounts", "Events"],
         location: {
-          address: "789 University Ave",
-          coordinates: [-74.106, 40.7528],
+          address: "Carrer de Muntaner 789, Barcelona, 08021",
+          coordinates: [2.1490, 41.3926],
         },
         distance: 850,
         rating: 4.5
@@ -162,8 +162,8 @@ const mockGamingVenues: GamingVenue[] = [
         availability: { status: "available" },
         amenities: ["Free Game Library", "Student Discounts", "Events"],
         location: {
-          address: "789 University Ave",
-          coordinates: [-74.106, 40.7528],
+          address: "Carrer de Muntaner 789, Barcelona, 08021",
+          coordinates: [2.1490, 41.3926],
         },
         distance: 850,
         rating: 4.5
@@ -184,8 +184,8 @@ const standaloneGamingTables: GamingTable[] = [
     capacity: 4,
     amenities: ["Quiet", "Good Lighting"],
     location: {
-      address: "123 Library St",
-      coordinates: [-74.005, 40.7135],
+      address: "Carrer de Provença 123, Barcelona, 08036",
+      coordinates: [2.1533, 41.3891],
     },
     distance: 500,
     rating: 4.5
@@ -200,8 +200,8 @@ const standaloneGamingTables: GamingTable[] = [
     capacity: 6,
     amenities: ["Premium", "Lobby Service"],
     location: {
-      address: "789 Hotel Ave",
-      coordinates: [-74.002, 40.7100],
+      address: "Carrer d'Enric Granados 789, Barcelona, 08007",
+      coordinates: [2.1569, 41.3877],
     },
     distance: 800,
     rating: 4.7

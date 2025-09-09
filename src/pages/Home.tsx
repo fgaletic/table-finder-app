@@ -22,33 +22,8 @@ const Home = () => {
     queryFn: fetchGamingTables,
   });
 
-  // Process tables to add distance based on user location
-  const processedTables = useMemo(() => {
-    if (!tables) return [];
-    
-    // Mock user location (New York City)
-    const userLocation: [number, number] = [-74.0060, 40.7128];
-    
-    return tables.map(table => {
-      // Calculate mock distance (replace with real calculation in production)
-      const distance = calculateDistance(
-        userLocation,
-        table.location ? table.location.coordinates : [-74.0060, 40.7128]
-      );
-      
-      return {
-        ...table,
-        distance: Math.round(distance * 1000), // Convert km to meters
-      } as GamingTable & { distance: number };
-    });
-  }, [tables]);
-
-  // Calculate distance between two points in km
-  function calculateDistance(
-    coords1: [number, number],
-    coords2: [number, number]
-  ): number {
-    // This is a simplified version (Haversine formula)
+  // Calculate distance between two points in km using Haversine formula
+  const calculateDistance = (coords1: [number, number], coords2: [number, number]): number => {
     const R = 6371; // Earth's radius in km
     const dLat = deg2rad(coords2[1] - coords1[1]);
     const dLon = deg2rad(coords2[0] - coords1[0]);
@@ -60,11 +35,32 @@ const Home = () => {
     
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Distance in km
-  }
+  };
 
-  function deg2rad(deg: number): number {
+  const deg2rad = (deg: number): number => {
     return deg * (Math.PI / 180);
-  }
+  };
+
+  // Process tables to add distance based on user location
+  const processedTables = useMemo(() => {
+    if (!tables) return [];
+    
+    // Barcelona city center (Plaça de Catalunya)
+    const userLocation: [number, number] = [2.1700, 41.3874];
+    
+    return tables.map(table => {
+      // Calculate distance from Barcelona city center
+      const distance = calculateDistance(
+        userLocation,
+        table.location ? table.location.coordinates : [2.1700, 41.3874]
+      );
+      
+      return {
+        ...table,
+        distance: Math.round(distance * 1000), // Convert km to meters
+      } as GamingTable & { distance: number };
+    });
+  }, [tables]);
 
   const filteredTables = (processedTables || []).filter(
     (table) =>
