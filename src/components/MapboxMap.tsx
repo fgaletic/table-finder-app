@@ -27,6 +27,20 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
   zoom = 13,
   isLoading = false
 }) => {
+  // Mapbox style version mapping for easier updates
+  const MAPBOX_STYLE_VERSIONS: Record<string, string> = {
+    streets: 'v12',
+    outdoors: 'v12',
+    light: 'v11',
+    dark: 'v11'
+  };
+  
+  // Validate MapBox token format
+  const isValidTokenFormat = (token: string): boolean => {
+    // MapBox tokens start with 'pk.' and are base64 encoded
+    return token.startsWith('pk.') && token.length > 20;
+  };
+  
   const { mapboxToken } = useMapToken();
   const navigate = useNavigate();
   const mapRef = useRef<MapRef>(null);
@@ -38,19 +52,26 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
     zoom: zoom
   });
 
-  const [mapStyle, setMapStyle] = useState('mapbox://styles/mapbox/streets-v12');
+  const [mapStyle, setMapStyle] = useState(`mapbox://styles/mapbox/streets-${MAPBOX_STYLE_VERSIONS.streets}`);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   // Handle map errors gracefully
   const onError = useCallback((error: Error) => {
     console.error('MapBox error:', error);
-    toast.error('Map failed to load. Check your MapBox token.');
+    const errorMessage = (error?.message || error?.toString() || '').toLowerCase();
+    
+    if (errorMessage.includes('unauthorized') || errorMessage.includes('forbidden')) {
+      toast.error('Invalid MapBox token. Please check your access token.');
+    } else if (errorMessage.includes('network') || errorMessage.includes('404')) {
+      toast.error('Network error or resource not found. Please check your internet connection.');
+    } else {
+      toast.error('Map failed to load. Check your MapBox token.');
+    }
   }, []);
 
   // Handle map load
   const onLoad = useCallback(() => {
     setIsMapLoaded(true);
-    // Note: Removed toast notification to avoid disruption on page refreshes
   }, []);
 
   // Fit map to Barcelona bounds on load
@@ -103,30 +124,26 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
     table.location && isInBarcelona(table.location.coordinates)
   );
 
-  // Mapbox style version mapping for easier updates
-  const MAPBOX_STYLE_VERSIONS: Record<string, string> = {
-    streets: 'v12',
-    outdoors: 'v12',
-    light: 'v11',
-    dark: 'v11'
-  };
-  
-  // Map style options
+  // Map style options with proper mapbox:// URLs
   const mapStyles = [
-    { id: `streets-${MAPBOX_STYLE_VERSIONS.streets}`, name: 'Streets' },
-    { id: `outdoors-${MAPBOX_STYLE_VERSIONS.outdoors}`, name: 'Outdoors' },
-    { id: `light-${MAPBOX_STYLE_VERSIONS.light}`, name: 'Light' },
-    { id: `dark-${MAPBOX_STYLE_VERSIONS.dark}`, name: 'Dark' }
+    { id: `mapbox://styles/mapbox/streets-${MAPBOX_STYLE_VERSIONS.streets}`, name: 'Streets' },
+    { id: `mapbox://styles/mapbox/outdoors-${MAPBOX_STYLE_VERSIONS.outdoors}`, name: 'Outdoors' },
+    { id: `mapbox://styles/mapbox/light-${MAPBOX_STYLE_VERSIONS.light}`, name: 'Light' },
+    { id: `mapbox://styles/mapbox/dark-${MAPBOX_STYLE_VERSIONS.dark}`, name: 'Dark' }
   ];
 
-  if (!mapboxToken) {
+  if (!mapboxToken || !isValidTokenFormat(mapboxToken)) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-100">
         <div className="text-center p-6">
           <MapPin className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">MapBox Token Required</h3>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">
+            {!mapboxToken ? 'MapBox Token Required' : 'Invalid MapBox Token'}
+          </h3>
           <p className="text-gray-500 text-sm">
-            Set a valid MapBox token to view the Barcelona gaming table map.
+            {!mapboxToken 
+              ? 'Set a valid MapBox token to view the Barcelona gaming table map.'
+              : 'The provided MapBox token is invalid. Please check the token format.'}
           </p>
         </div>
       </div>
@@ -140,7 +157,7 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
         {...viewState}
         onMove={(evt) => setViewState(evt.viewState)}
         mapboxAccessToken={mapboxToken}
-        mapStyle={`mapbox://styles/mapbox/${mapStyle}`}
+        mapStyle={mapStyle}
         onError={onError}
         onLoad={onLoad}
         attributionControl={false}
