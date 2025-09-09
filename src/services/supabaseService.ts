@@ -1,6 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { GamingTable } from "./gamingTableData";
 import { geocodeAddress } from "./geocodingService";
+import { getBarcelonaMockTables, getBarcelonaMockTableWithHost } from "./barcelonaMockData";
+import { toast } from "sonner";
 
 export interface Host {
   id: string;
@@ -33,41 +35,51 @@ export interface Message {
   created_at?: string;
 }
 
-// Fetch all gaming tables from Supabase
-export const fetchGamingTables = async () => {
-  const { data, error } = await supabase
-    .from("gaming_tables")
-    .select("*");
-  
-  if (error) {
-    console.error("Error fetching gaming tables:", error);
-    throw error;
+// Fetch all gaming tables from Supabase with Barcelona fallback
+export const fetchGamingTables = async (): Promise<GamingTable[]> => {
+  try {
+    const { data, error } = await supabase
+      .from("gaming_tables")
+      .select("*");
+    
+    if (error) {
+      console.warn("Supabase error, falling back to Barcelona mock data:", error);
+      toast.info("Using Barcelona demo data - some features may be limited");
+      return await getBarcelonaMockTables();
+    }
+    
+    if (!data || data.length === 0) {
+      console.info("No tables in Supabase, using Barcelona mock data");
+      toast.info("Loading Barcelona demo gaming tables");
+      return await getBarcelonaMockTables();
+    }
+    
+    // Transform Supabase data to match our GamingTable interface
+    return data.map(table => ({
+      id: table.id,
+      name: table.name,
+      description: table.description || "",
+      location: {
+        address: table.location_address,
+        coordinates: [table.longitude, table.latitude] as [number, number],
+      },
+      images: table.images || ["/placeholder.svg"],
+      availability: {
+        status: (table.availability_status || "available") as "available" | "occupied" | "maintenance",
+        until: table.availability_until,
+      },
+      capacity: table.capacity,
+      amenities: table.amenities || [],
+      rating: table.rating,
+      reviewCount: table.review_count,
+      distance: 0, // Will be calculated based on user location
+      host_id: table.host_id,
+    }));
+  } catch (networkError) {
+    console.warn("Network error accessing Supabase, using Barcelona fallback:", networkError);
+    toast.error("Connection issue - using offline Barcelona data");
+    return await getBarcelonaMockTables();
   }
-  
-  // Transform to match our existing GamingTable interface with proper type casting
-  return data.map(table => ({
-    id: table.id,
-    name: table.name,
-    description: table.description || "",
-    location: {
-      address: table.location_address,
-      coordinates: [table.longitude, table.latitude] as [number, number],
-    },
-    images: table.images || ["/placeholder.svg"],
-    availability: {
-      status: (table.availability_status || "available") as "available" | "occupied" | "maintenance",
-      until: table.availability_until,
-    },
-    capacity: table.capacity,
-    amenities: table.amenities || [],
-    rating: table.rating,
-    reviewCount: table.review_count,
-    distance: 0, // Will be calculated based on user location
-    host_id: table.host_id,
-    // We intentionally don't add fields like "venueId" or "venueName" here
-    // to avoid biasing towards venues. Instead, host information can indicate
-    // if this is a private table or part of a commercial venue
-  }));
 };
 
 // New function to create a gaming table with address geocoding
@@ -111,54 +123,59 @@ export const createGamingTable = async (
   return data[0];
 };
 
-// Fetch a single gaming table with its host information
+// Fetch a single gaming table with its host information with Barcelona fallback
 export const fetchGamingTableWithHost = async (id: string) => {
-  // First fetch the gaming table
-  const { data: tableData, error: tableError } = await supabase
-    .from("gaming_tables")
-    .select("*")
-    .eq("id", id)
-    .single();
-  
-  if (tableError) {
-    console.error("Error fetching gaming table:", tableError);
-    throw tableError;
-  }
-  
-  // Then fetch the host information
-  const { data: hostData, error: hostError } = await supabase
-    .from("hosts")
-    .select("*")
-    .eq("id", tableData.host_id)
-    .single();
-  
-  if (hostError) {
-    console.error("Error fetching host information:", hostError);
-  }
-  
-  // Transform to match our existing GamingTable interface and add host
-  return {
-    table: {
-      id: tableData.id,
-      name: tableData.name,
-      description: tableData.description || "",
-      location: {
-        address: tableData.location_address,
-        coordinates: [tableData.longitude, tableData.latitude] as [number, number],
+  try {
+    // First fetch the gaming table
+    const { data: tableData, error: tableError } = await supabase
+      .from("gaming_tables")
+      .select("*")
+      .eq("id", id)
+      .single();
+    
+    if (tableError) {
+      console.warn("Supabase table fetch error, trying Barcelona mock data:", tableError);
+      return await getBarcelonaMockTableWithHost(id);
+    }
+    
+    // Then fetch the host information
+    const { data: hostData, error: hostError } = await supabase
+      .from("hosts")
+      .select("*")
+      .eq("id", tableData.host_id)
+      .single();
+    
+    if (hostError) {
+      console.warn("Error fetching host information:", hostError);
+    }
+    
+    // Transform Supabase data to match our interface and add host
+    return {
+      table: {
+        id: tableData.id,
+        name: tableData.name,
+        description: tableData.description || "",
+        location: {
+          address: tableData.location_address,
+          coordinates: [tableData.longitude, tableData.latitude] as [number, number],
+        },
+        images: tableData.images || ["/placeholder.svg"],
+        availability: {
+          status: (tableData.availability_status || "available") as "available" | "occupied" | "maintenance",
+          until: tableData.availability_until,
+        },
+        capacity: tableData.capacity,
+        amenities: tableData.amenities || [],
+        rating: tableData.rating,
+        reviewCount: tableData.review_count,
+        host_id: tableData.host_id,
       },
-      images: tableData.images || ["/placeholder.svg"],
-      availability: {
-        status: (tableData.availability_status || "available") as "available" | "occupied" | "maintenance",
-        until: tableData.availability_until,
-      },
-      capacity: tableData.capacity,
-      amenities: tableData.amenities || [],
-      rating: tableData.rating,
-      reviewCount: tableData.review_count,
-      host_id: tableData.host_id,
-    },
-    host: hostData || null,
-  };
+      host: hostData || null,
+    };
+  } catch (networkError) {
+    console.warn("Network error accessing Supabase, using Barcelona fallback for table:", id, networkError);
+    return await getBarcelonaMockTableWithHost(id);
+  }
 };
 
 // Book a gaming table

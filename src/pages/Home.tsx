@@ -11,6 +11,25 @@ import { SliderPicker } from "@/components/SliderPicker";
 import { RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
+// Calculate distance between two points in km using Haversine formula
+const calculateDistance = (coords1: [number, number], coords2: [number, number]): number => {
+  const R = 6371; // Earth's radius in km
+  const dLat = deg2rad(coords2[1] - coords1[1]);
+  const dLon = deg2rad(coords2[0] - coords1[0]);
+  
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(coords1[1])) * Math.cos(deg2rad(coords2[1])) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
+};
+
+const deg2rad = (deg: number): number => {
+  return deg * (Math.PI / 180);
+};
+
 const Home = () => {
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const [maxDistance, setMaxDistance] = useState<number>(1500);
@@ -21,25 +40,6 @@ const Home = () => {
     queryKey: ["gamingTables"],
     queryFn: fetchGamingTables,
   });
-
-  // Calculate distance between two points in km using Haversine formula
-  const calculateDistance = (coords1: [number, number], coords2: [number, number]): number => {
-    const R = 6371; // Earth's radius in km
-    const dLat = deg2rad(coords2[1] - coords1[1]);
-    const dLon = deg2rad(coords2[0] - coords1[0]);
-    
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(coords1[1])) * Math.cos(deg2rad(coords2[1])) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
-  };
-
-  const deg2rad = (deg: number): number => {
-    return deg * (Math.PI / 180);
-  };
 
   // Process tables to add distance based on user location
   const processedTables = useMemo(() => {
