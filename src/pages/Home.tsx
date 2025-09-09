@@ -32,8 +32,9 @@ const deg2rad = (deg: number): number => {
 
 const Home = () => {
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
-  const [maxDistance, setMaxDistance] = useState<number>(1500);
-  const [minRating, setMinRating] = useState<number>(3);
+  // Start with permissive defaults so users see tables immediately
+  const [maxDistance, setMaxDistance] = useState<number>(5000);
+  const [minRating, setMinRating] = useState<number>(1);
 
   // Fetch tables from Supabase
   const { data: tables, isLoading, error, refetch } = useQuery({
@@ -144,9 +145,14 @@ const Home = () => {
             ) : (
               <div className="text-center py-8">
                 <p className="text-muted-foreground">No gaming tables match your filters</p>
-                <Button variant="link" onClick={() => { setMaxDistance(3000); setMinRating(1); }}>
-                  Reset filters
-                </Button>
+                <div className="flex items-center justify-center gap-2">
+                  <Button variant="outline" onClick={() => { setMaxDistance(5000); setMinRating(1); }}>
+                    Show all Barcelona tables
+                  </Button>
+                  <Button variant="link" onClick={() => { setMaxDistance(3000); setMinRating(3); }}>
+                    Reset filters
+                  </Button>
+                </div>
               </div>
             )}
           </div>

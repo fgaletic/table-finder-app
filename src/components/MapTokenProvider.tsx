@@ -22,9 +22,13 @@ interface MapTokenProviderProps {
   defaultToken?: string;
 }
 
-// This is a fallback public token for demo purposes
-// In production, you should use your own token or fetch from environment variables
-const DEMO_TOKEN = "pk.eyJ1IjoibG92YWJsZS1kZW1vIiwiYSI6ImNsazE0dGVnbDBhYXYzZGticDdkZjRnb3YifQ.lb4OjDvAFznA3fCebOgSng";
+// Try to get token from environment first, then fallback to localStorage
+// Set VITE_MAPBOX_ACCESS_TOKEN in your .env file
+const ENV_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+
+// This is a fallback public token for demo purposes (may be expired)
+// In production, you should use your own token from environment variables
+const DEMO_TOKEN = ENV_TOKEN || "pk.eyJ1IjoibG92YWJsZS1kZW1vIiwiYSI6ImNsazE0dGVnbDBhYXYzZGticDdkZjRnb3YifQ.lb4OjDvAFznA3fCebOgSng";
 
 export const MapTokenProvider = ({ 
   children, 
