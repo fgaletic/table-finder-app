@@ -3,6 +3,7 @@
 // Features authentic Barcelona addresses, neighborhoods, and cultural context
 
 import { GamingTable } from "./gamingTableData";
+import { calculateDistance, BARCELONA_CENTER } from "@/lib/geoUtils";
 
 export const BARCELONA_MOCK_GAMING_TABLES: GamingTable[] = [
   {
@@ -292,9 +293,6 @@ export const BARCELONA_MOCK_HOSTS = [
  */
 export const getBarcelonaMockTables = (): Promise<GamingTable[]> => {
   return new Promise((resolve) => {
-    // Barcelona city center (Plaça de Catalunya)
-    const BARCELONA_CENTER: [number, number] = [2.1700, 41.3874];
-    
     // Calculate distances from city center
     const tablesWithDistance = BARCELONA_MOCK_GAMING_TABLES.map(table => {
       const distance = calculateDistance(
@@ -337,29 +335,6 @@ export const getBarcelonaMockTableWithHost = (id: string): Promise<{
   });
 };
 
-/**
- * Calculate distance between two coordinates using Haversine formula
- */
-function calculateDistance(
-  coords1: [number, number],
-  coords2: [number, number]
-): number {
-  const R = 6371; // Earth's radius in km
-  const dLat = deg2rad(coords2[1] - coords1[1]);
-  const dLon = deg2rad(coords2[0] - coords1[0]);
-  
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(coords1[1])) * Math.cos(deg2rad(coords2[1])) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c; // Distance in km
-}
-
-function deg2rad(deg: number): number {
-  return deg * (Math.PI / 180);
-}
 
 /**
  * Barcelona neighborhoods covered by mock data
