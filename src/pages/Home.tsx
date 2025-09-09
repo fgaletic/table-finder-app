@@ -149,7 +149,7 @@ const Home = () => {
                   <Button variant="outline" onClick={() => { setMaxDistance(5000); setMinRating(1); }}>
                     Show all Barcelona tables
                   </Button>
-                  <Button variant="link" onClick={() => { setMaxDistance(3000); setMinRating(3); }}>
+                  <Button variant="link" onClick={() => { setMaxDistance(3000); setMinRating(1); }}>
                     Reset filters
                   </Button>
                 </div>
