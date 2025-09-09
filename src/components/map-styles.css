@@ -1,0 +1,99 @@
+/* Map container styles */
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Barcelona indicator styles */
+.barcelona-indicator {
+  background: rgba(255, 235, 59, 0.9);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgb(120, 53, 15);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.barcelona-indicator:hover {
+  background: rgba(255, 235, 59, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+}
+
+/* Custom MapBox popup styles */
+.mapboxgl-popup-content {
+  padding: 0 !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: white !important;
+}
+
+.gaming-table-popup .mapboxgl-popup-content {
+  min-width: 200px;
+  max-width: 300px;
+}
+
+/* Custom marker hover effects */
+.mapbox-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.mapbox-marker:hover {
+  transform: scale(1.1);
+}
+
+/* Loading animation for map */
+@keyframes map-loading {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.map-loading {
+  animation: map-loading 1.5s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .barcelona-indicator {
+    font-size: 0.625rem;
+    padding: 0.375rem 0.5rem;
+  }
+  
+  .gaming-table-popup .mapboxgl-popup-content {
+    min-width: 180px;
+    max-width: 250px;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .barcelona-indicator {
+    background: rgba(255, 235, 59, 0.8);
+    color: rgb(92, 41, 11);
+  }
+  
+  .barcelona-indicator:hover {
+    background: rgba(255, 235, 59, 0.9);
+  }
+}

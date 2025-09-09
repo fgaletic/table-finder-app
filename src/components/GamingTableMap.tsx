@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { GamingTable } from "@/services/gamingTableData";
 import { useNavigate } from "react-router-dom";
-import { Dices, MapPin } from "lucide-react";
+import { Dices, MapPin, Settings } from "lucide-react";
+import MapboxMap from "@/components/MapboxMap";
+import { useMapToken } from "./MapTokenProvider";
+import MapTokenDialog from "./MapTokenDialog";
+import { Button } from "@/components/ui/button";
+import "./map-styles.css";
 
 interface GamingTableMapProps {
   // Update to match the return type of getAllAvailableTables
@@ -14,22 +19,24 @@ interface GamingTableMapProps {
   isLoading?: boolean;
 }
 
-// We keep the existing mock map implementation
-// In a future update, we can replace this with a real map using Mapbox GL JS
+// Component can switch between mock map and real MapBox implementation
 const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps) => {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { isTokenSet } = useMapToken();
+  const [useRealMap, setUseRealMap] = useState(true);
+  const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
   
-  // Convert longitude, latitude to X, Y positions on our mock map
+  // Convert longitude, latitude to X, Y positions on our mock map (used when real map fails)
   const getPositionFromCoordinates = (coords: [number, number]) => {
-    // NYC coordinates as center reference point (approx)
-    const centerLng = -74.0060; 
-    const centerLat = 40.7128;
+    // Barcelona coordinates as center reference point (approx)
+    const centerLng = 2.1734; 
+    const centerLat = 41.3851;
     
     // Scale factors - adjust these to control sensitivity of map movements
     // These are arbitrary values that work for our mock map display
-    const lngScale = 400; // Controls horizontal spread
-    const latScale = 300; // Controls vertical spread
+    const lngScale = 1200; // Controls horizontal spread (higher value for Barcelona's smaller area)
+    const latScale = 1000; // Controls vertical spread (higher value for Barcelona's smaller area)
     
     // Calculate percentage position within our map view
     // We add an offset to make the positions more centered on the map
@@ -79,10 +86,53 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
   useEffect(() => {
     setSelectedId(null);
   }, [gamingTables]);
+  
+  // Dynamically add CSS for marker positions
+  useEffect(() => {
+    if (!positionedGamingTables) return;
+    
+    // Create style element if it doesn't exist
+    let styleEl = document.getElementById('dynamic-marker-styles');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'dynamic-marker-styles';
+      document.head.appendChild(styleEl);
+    }
+    
+    // Generate CSS rules for each marker
+    const cssRules = positionedGamingTables.map(table => 
+      `.custom-marker-${table.id} {
+        top: ${table.posY};
+        left: ${table.posX};
+      }`
+    ).join('\n');
+    
+    // Update style element
+    styleEl.textContent = cssRules;
+    
+    // Clean up on unmount
+    return () => {
+      if (styleEl && document.head.contains(styleEl)) {
+        document.head.removeChild(styleEl);
+      }
+    };
+  }, [positionedGamingTables]);
 
-  // Display a note about upgrading to a real map in the future
+  // Switch between real MapBox map and mock map
   return (
     <div className="map-container relative bg-blue-50 overflow-hidden">
+      {/* Use the real MapBox map when token is available and useRealMap is true */}
+      {isTokenSet && useRealMap ? (
+        <MapboxMap 
+          gamingTables={gamingTables} 
+          isLoading={isLoading}
+          // Default center to Barcelona
+          center={[2.1734, 41.3851]} 
+          zoom={13}
+        />
+      ) : (
+        <>
+          {/* Mock map background - fallback when MapBox isn't available */}
       {/* Mock map background */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100">
         {/* Mock streets */}
@@ -99,10 +149,49 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
         <div className="absolute top-[40%] left-[85%] w-[10%] h-[10%] bg-gray-100 rounded-sm"></div>
       </div>
 
-      {/* Banner about upgrading to Mapbox */}
-      <div className="absolute top-2 left-2 right-2 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-md text-sm text-center shadow-sm">
-        <p>Using mock map. Replace with Mapbox for accurate geographic display.</p>
-      </div>
+          {/* Barcelona Indicator with Enhanced Mode Toggle */}
+          <div className="absolute top-2 right-2 flex gap-2">
+            <button 
+              onClick={() => {
+                // Toggle advanced Barcelona mode
+                localStorage.setItem("barcelonaAdvancedMode", 
+                  localStorage.getItem("barcelonaAdvancedMode") === "true" ? "false" : "true");
+                // Force re-render (in a real app, use state)
+                window.location.reload();
+              }}
+              className="barcelona-indicator cursor-pointer hover:bg-yellow-200"
+            >
+              <MapPin className="h-3 w-3" /> Barcelona Mode
+            </button>
+          </div>
+
+          {/* Banner about upgrading to Mapbox */}
+          <div className="absolute top-2 left-2 right-20 bg-white/80 backdrop-blur-sm px-3 py-2 rounded-md text-sm text-center shadow-sm">
+            {isTokenSet ? 
+              <div className="flex flex-col gap-1">
+                <p>Using Barcelona mock map. Click below to use real MapBox for accurate geographic display.</p>
+                <button 
+                  onClick={() => setUseRealMap(true)}
+                  className="text-xs bg-blue-600 text-white py-1 px-2 rounded hover:bg-blue-700"
+                >
+                  Switch to MapBox
+                </button>
+              </div>
+              : 
+              <div className="flex flex-col gap-1">
+                <p>Set a valid MapBox token to enable real Barcelona maps.</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setTokenDialogOpen(true)}
+                  className="text-xs"
+                >
+                  <Settings className="h-3 w-3 mr-1" /> 
+                  Configure MapBox Token
+                </Button>
+              </div>
+            }
+          </div>
       
       {/* Loading overlay */}
       {isLoading && (
@@ -173,6 +262,14 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
           </div>
         );
       })}
+        </>
+      )}
+      
+      {/* MapBox Token Dialog */}
+      <MapTokenDialog 
+        isOpen={tokenDialogOpen} 
+        onClose={() => setTokenDialogOpen(false)}
+      />
     </div>
   );
 };
