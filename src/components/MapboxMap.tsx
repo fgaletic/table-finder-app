@@ -50,7 +50,7 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
   // Handle map load
   const onLoad = useCallback(() => {
     setIsMapLoaded(true);
-    toast.success('Barcelona map loaded successfully!');
+    // Note: Removed toast notification to avoid disruption on page refreshes
   }, []);
 
   // Fit map to Barcelona bounds on load
@@ -103,12 +103,20 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
     table.location && isInBarcelona(table.location.coordinates)
   );
 
+  // Mapbox style version mapping for easier updates
+  const MAPBOX_STYLE_VERSIONS: Record<string, string> = {
+    streets: 'v12',
+    outdoors: 'v12',
+    light: 'v11',
+    dark: 'v11'
+  };
+  
   // Map style options
   const mapStyles = [
-    { id: 'streets-v12', name: 'Streets' },
-    { id: 'outdoors-v12', name: 'Outdoors' },
-    { id: 'light-v11', name: 'Light' },
-    { id: 'dark-v11', name: 'Dark' }
+    { id: `streets-${MAPBOX_STYLE_VERSIONS.streets}`, name: 'Streets' },
+    { id: `outdoors-${MAPBOX_STYLE_VERSIONS.outdoors}`, name: 'Outdoors' },
+    { id: `light-${MAPBOX_STYLE_VERSIONS.light}`, name: 'Light' },
+    { id: `dark-${MAPBOX_STYLE_VERSIONS.dark}`, name: 'Dark' }
   ];
 
   if (!mapboxToken) {

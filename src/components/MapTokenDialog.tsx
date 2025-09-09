@@ -19,12 +19,14 @@ const MapTokenDialog: React.FC<MapTokenDialogProps> = ({ isOpen, onClose }) => {
   const [validationResult, setValidationResult] = useState<'valid' | 'invalid' | null>(null);
 
   // Validate MapBox token by making a simple API call
+  // NOTE: In production, consider server-side validation to avoid token exposure in URLs
   const validateToken = async (token: string): Promise<boolean> => {
     if (!token || !token.startsWith('pk.')) {
       return false;
     }
 
     try {
+      // Using GET request for simplicity in demo - in production, use server-side validation
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/barcelona.json?access_token=${token}&limit=1`
       );

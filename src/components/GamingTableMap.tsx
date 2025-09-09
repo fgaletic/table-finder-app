@@ -26,6 +26,9 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
   const { isTokenSet } = useMapToken();
   const [useRealMap, setUseRealMap] = useState(true);
   const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
+  const [barcelonaAdvancedMode, setBarcelonaAdvancedMode] = useState(
+    () => localStorage.getItem("barcelonaAdvancedMode") === "true"
+  );
   
   // Convert longitude, latitude to X, Y positions on our mock map (used when real map fails)
   const getPositionFromCoordinates = (coords: [number, number]) => {
@@ -87,19 +90,30 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
     setSelectedId(null);
   }, [gamingTables]);
   
-  // Dynamically add CSS for marker positions
+  // Ref to keep track of the dynamic style element
+  const styleElRef = useRef<HTMLStyleElement | null>(null);
+  
+  // Create style element on mount, remove on unmount
   useEffect(() => {
-    if (!positionedGamingTables) return;
-    
-    // Create style element if it doesn't exist
-    let styleEl = document.getElementById('dynamic-marker-styles');
+    let styleEl = document.getElementById('dynamic-marker-styles') as HTMLStyleElement | null;
     if (!styleEl) {
       styleEl = document.createElement('style');
       styleEl.id = 'dynamic-marker-styles';
       document.head.appendChild(styleEl);
     }
+    styleElRef.current = styleEl;
     
-    // Generate CSS rules for each marker
+    return () => {
+      if (styleEl && document.head.contains(styleEl)) {
+        document.head.removeChild(styleEl);
+      }
+    };
+  }, []);
+  
+  // Update style element content when positionedGamingTables changes
+  useEffect(() => {
+    if (!positionedGamingTables || !styleElRef.current) return;
+    
     const cssRules = positionedGamingTables.map(table => 
       `.custom-marker-${table.id} {
         top: ${table.posY};
@@ -107,15 +121,7 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
       }`
     ).join('\n');
     
-    // Update style element
-    styleEl.textContent = cssRules;
-    
-    // Clean up on unmount
-    return () => {
-      if (styleEl && document.head.contains(styleEl)) {
-        document.head.removeChild(styleEl);
-      }
-    };
+    styleElRef.current.textContent = cssRules;
   }, [positionedGamingTables]);
 
   // Switch between real MapBox map and mock map
@@ -153,11 +159,9 @@ const GamingTableMap = ({ gamingTables, isLoading = false }: GamingTableMapProps
           <div className="absolute top-2 right-2 flex gap-2">
             <button 
               onClick={() => {
-                // Toggle advanced Barcelona mode
-                localStorage.setItem("barcelonaAdvancedMode", 
-                  localStorage.getItem("barcelonaAdvancedMode") === "true" ? "false" : "true");
-                // Force re-render (in a real app, use state)
-                window.location.reload();
+                const newMode = !barcelonaAdvancedMode;
+                setBarcelonaAdvancedMode(newMode);
+                localStorage.setItem("barcelonaAdvancedMode", newMode.toString());
               }}
               className="barcelona-indicator cursor-pointer hover:bg-yellow-200"
             >
